@@ -28,7 +28,7 @@ async function bootstrap() {
     )
 
     app.enableCors({
-        origin: function (origin, callback) {
+        origin: function (origin: string, callback: any) {
             if (!origin || allowedOrigins?.indexOf(origin) !== -1) {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                 callback(null, true)
