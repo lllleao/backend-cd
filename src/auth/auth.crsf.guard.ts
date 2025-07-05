@@ -1,4 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common'
+import {
+    Injectable,
+    CanActivate,
+    ExecutionContext,
+    ForbiddenException
+} from '@nestjs/common'
 import { Request } from 'express'
 import { verifyCsrfToken } from './utils/csrf.utils'
 
@@ -8,9 +13,24 @@ export class CrsfGuard implements CanActivate {
         const req = context.switchToHttp().getRequest<Request>()
 
         const token = req.headers['csrf-token'] as string
+        if (!token) {
+            throw new ForbiddenException({
+                message: 'CSRF token ausente no cabeçalho da requisição.',
+                statusCode: 403,
+                error: 'CSRF Token Missing'
+            })
+        }
 
-        if (!token) return false
+        const isValid = verifyCsrfToken(token)
 
-        return verifyCsrfToken(token)
+        if (!isValid) {
+            throw new ForbiddenException({
+                message: 'CSRF token inválido ou expirado.',
+                statusCode: 403,
+                error: 'CSRF Token Invalid'
+            })
+        }
+
+        return isValid
     }
 }

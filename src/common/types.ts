@@ -2,6 +2,7 @@ import { Request } from 'express'
 
 export interface AuthenticatedRequest extends Request {
     cookies: {
+        [x: string]: any
         jwt?: string
     }
     user?: any

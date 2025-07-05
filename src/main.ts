@@ -2,13 +2,16 @@ import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import * as cookieParser from 'cookie-parser'
 import helmet from 'helmet'
+import { NestExpressApplication } from '@nestjs/platform-express'
+import { join } from 'path'
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule)
+    const app = await NestFactory.create<NestExpressApplication>(AppModule)
+    const staticDirectory = join(__dirname, '..', 'public')
+    app.useStaticAssets(staticDirectory)
 
     const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',')
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     app.use(cookieParser())
     app.use(helmet())
     app.use(
@@ -38,13 +41,11 @@ async function bootstrap() {
             }
         },
         methods: 'GET,POST,OPTIONS,DELETE,PATCH',
-        allowedHeaders: ['Content-Type', 'CSRF-Token', 'authorization'],
+        allowedHeaders: ['Content-Type', 'csrf-token', 'authorization'],
         credentials: true
     })
 
-    await app.listen(process.env.PORT ?? 3000)
-
-    //DEPOIS CONFIGURAR O LIMITE DE REQUISIÇÕES PARA ROTAS
+    await app.listen(process.env.PORT ?? 3000, '0.0.0.0')
 }
 bootstrap()
     .then((res) => console.log(res))

@@ -5,10 +5,10 @@ import { AppService } from './app.service'
 import { PrismaModule } from './prisma/prisma.module'
 import { BooksrModule } from './books/books.module'
 import { ConfigModule } from '@nestjs/config'
-import { ServeStaticModule } from '@nestjs/serve-static'
-import { join } from 'path'
 import { AuthModule } from './auth/auth.module'
 import { EmailModule } from './emial/email.module'
+import { UserModel } from './user/user.module'
+import { CartModule } from './cart/cart.module'
 
 @Module({
     imports: [
@@ -17,11 +17,10 @@ import { EmailModule } from './emial/email.module'
         ConfigModule.forRoot({
             isGlobal: true
         }),
-        ServeStaticModule.forRoot({
-            rootPath: join(__dirname, '..', 'public')
-        }),
         AuthModule,
-        EmailModule
+        EmailModule,
+        UserModel,
+        CartModule
     ],
     controllers: [AppController, CatsController],
     providers: [AppService]

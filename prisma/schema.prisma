@@ -56,6 +56,21 @@ model user_cd {
     token        String?    @db.Text
     cart         cart?
     purchase     Purchase[]
+    address      address[]
+}
+
+model address {
+    id           Int     @id @default(autoincrement())
+    name         String  @db.VarChar(100)
+    street       String  @db.VarChar(100)
+    number       String  @db.VarChar(10)
+    neighborhood String  @db.VarChar(100)
+    zipCode      String  @db.VarChar(20)
+    complement   String? @db.VarChar(100)
+    cpf          String  @db.VarChar(11)
+    isDefault    Boolean @default(false)
+    user         user_cd @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId       Int
 }
 
 model cart {

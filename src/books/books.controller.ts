@@ -1,10 +1,4 @@
-import {
-    Controller,
-    Get,
-    InternalServerErrorException,
-    Param,
-    ParseIntPipe
-} from '@nestjs/common'
+import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common'
 import { BooksService } from './books.service'
 import { Books, BookSpecific } from 'src/common/types'
 
@@ -14,42 +8,20 @@ export class BooksController {
 
     @Get('free')
     async getAllFreeBooks(): Promise<Books[]> {
-        try {
-            const data = await this.booksService.findAllFreeBooks()
-            return data
-        } catch (err) {
-            console.log(err)
-            throw new InternalServerErrorException(
-                'Erro ao buscar os livros da loja'
-            )
-        }
+        return (await this.booksService.findAllFreeBooks()) as unknown as Books[]
     }
 
     @Get('store')
     async getAllStoreBooks(): Promise<Books[]> {
-        try {
-            const data = await this.booksService.findAllStoreBooks()
-            return data
-        } catch (err) {
-            console.log(err)
-            throw new InternalServerErrorException(
-                'Erro ao buscar os livros da loja'
-            )
-        }
+        return (await this.booksService.findAllStoreBooks()) as unknown as Books[]
     }
 
     @Get('store/:id')
     async getSpecificStoreBook(
         @Param('id', ParseIntPipe) id: number
     ): Promise<BookSpecific> {
-        try {
-            const data = await this.booksService.findSpecificStoreBook(id)
-            return data
-        } catch (err) {
-            console.log(err)
-            throw new InternalServerErrorException(
-                'Erro ao buscar os livros da loja'
-            )
-        }
+        return (await this.booksService.findSpecificStoreBook(
+            id
+        )) as unknown as BookSpecific
     }
 }
