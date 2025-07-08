@@ -5,6 +5,7 @@ import { generateCsrfToken } from './utils/csrf.utils'
 export class AuthService {
     generateCsrfToken() {
         const { token } = generateCsrfToken()
+        // console.log('')
         return token
     }
 }
