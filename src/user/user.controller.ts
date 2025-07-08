@@ -40,19 +40,31 @@ export class UserController {
         @Res() res: Response
     ) {
         const { email, password } = body
-        const tokenFront = req.cookies.token as string
+        const tokenFront = req.cookies
+        console.log(tokenFront, 'aqui')
         if (tokenFront) {
             throw new BadRequestException('Usuário já logado')
         }
 
-        const token = await this.userService.login(email, password)
+        const { token, refreshToken } = await this.userService.login(
+            email,
+            password
+        )
 
         res.cookie('token', token, {
             path: '/',
             httpOnly: true,
             sameSite: 'lax', // none
-            // secure: true,
+            // secure: true, TROCAR PARA ALKGO SEGURO DEPOIS
             maxAge: 3600000
+        })
+
+        res.cookie('refresh', refreshToken, {
+            path: '/',
+            httpOnly: true,
+            sameSite: 'lax', // none
+            // secure: true, TROCAR PARA ALKGO SEGURO DEPOIS
+            maxAge: 604800000
         })
 
         return res.status(200).json({ success: true })

@@ -6,7 +6,10 @@ import {
 } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import * as bcrypt from 'bcrypt'
-import { generateJWTToken } from 'src/auth/utils/jwt.utils'
+import {
+    generateJWTToken,
+    generateRefreshJWTToken
+} from 'src/auth/utils/jwt.utils'
 import { EmailService } from 'src/emial/email.service'
 import { CreateAddressDto } from './user.dto'
 
@@ -90,7 +93,10 @@ export class UserService {
         }
     }
 
-    async login(email: string, password: string): Promise<{ token: string }> {
+    async login(
+        email: string,
+        password: string
+    ): Promise<{ token: string; refreshToken: string }> {
         const user = await this.prismaService.user_cd.findUnique({
             where: {
                 email
@@ -115,8 +121,13 @@ export class UserService {
         }
 
         const token = await generateJWTToken('60m', user?.email, user?.id)
+        const refreshToken = await generateRefreshJWTToken(
+            '7d',
+            user?.email,
+            user?.id
+        )
 
-        return { token }
+        return { token, refreshToken }
     }
 
     async profileData(user_id: number) {
