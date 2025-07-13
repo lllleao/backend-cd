@@ -12,7 +12,7 @@ export class JwtGuard implements CanActivate {
     canActivate(context: ExecutionContext): boolean {
         const req = context.switchToHttp().getRequest<AuthenticatedRequest>()
 
-        const token: { token: string } = req.cookies.token as { token: string }
+        const token = req.cookies.token as string
         if (!token) {
             throw new BadRequestException({
                 message: 'Token ausente.',
@@ -22,18 +22,24 @@ export class JwtGuard implements CanActivate {
         }
 
         try {
-            const decoded = jwt.verify(token.token, process.env.JWT_SECRET!)
+            const decoded = jwt.verify(token, process.env.JWT_SECRET!)
             req['user'] = decoded
             return true
         } catch (err) {
-            if (err instanceof jwt.JsonWebTokenError) {
+            if (
+                err instanceof jwt.JsonWebTokenError &&
+                !(err.message === 'jwt expired')
+            ) {
                 console.log('Token mal formado', err.message)
                 throw new BadRequestException({
                     message: 'Token mal formado',
                     error: 'Token mal formado',
                     statusCode: 400
                 })
-            } else if (err instanceof jwt.TokenExpiredError) {
+            } else if (
+                err instanceof jwt.JsonWebTokenError &&
+                err.message === 'jwt expired'
+            ) {
                 console.log('Token expirado:', err.message)
                 throw new BadRequestException({
                     message: 'Token expirado',

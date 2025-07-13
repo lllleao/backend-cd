@@ -14,6 +14,8 @@ import { CrsfGuard } from 'src/auth/auth.crsf.guard'
 import { Request, Response } from 'express'
 import { JwtGuard } from 'src/auth/auth.jwt.guard'
 import cpfValidator from './utils/cpfValidator'
+import * as jwt from 'jsonwebtoken'
+import { checkTokenFront } from './utils/user.utils'
 
 @Controller('user')
 export class UserController {
@@ -40,10 +42,32 @@ export class UserController {
         @Res() res: Response
     ) {
         const { email, password } = body
-        const tokenFront = req.cookies
-        console.log(tokenFront, 'aqui')
-        if (tokenFront) {
-            throw new BadRequestException('Usuário já logado')
+        const tokenFrontend = req.cookies.token as string
+
+        if (checkTokenFront(tokenFrontend)) {
+            try {
+                jwt.verify(tokenFrontend, process.env.JWT_SECRET!)
+                return res.status(400).json({ message: 'Usuário já logado' })
+            } catch (err) {
+                if (
+                    err instanceof jwt.JsonWebTokenError &&
+                    !(err.message === 'jwt expired')
+                ) {
+                    console.log('Token mal formado', err.message)
+                    throw new BadRequestException({
+                        message: 'Token mal formado',
+                        error: 'Token mal formado',
+                        statusCode: 400
+                    })
+                } else if (
+                    err instanceof jwt.TokenExpiredError &&
+                    err.message === 'jwt expired'
+                ) {
+                    console.log('Token expirado:', err.message)
+                } else {
+                    console.log('Erro desconhecido:', err)
+                }
+            }
         }
 
         const { token, refreshToken } = await this.userService.login(
@@ -60,7 +84,7 @@ export class UserController {
         })
 
         res.cookie('refresh', refreshToken, {
-            path: '/',
+            path: '/auth/refresh',
             httpOnly: true,
             sameSite: 'lax', // none
             // secure: true, TROCAR PARA ALKGO SEGURO DEPOIS
@@ -83,6 +107,7 @@ export class UserController {
     @Post('logout')
     logout(@Res() res: Response) {
         res.clearCookie('token')
+        res.clearCookie('refresh')
 
         res.status(200).json({ msg: 'Logout realizado' })
     }
