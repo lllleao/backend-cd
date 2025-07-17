@@ -1,7 +1,7 @@
 # Backend Cidadeclipse - TARTARU'S CAFETERIA 📚
 
 Este backend, batizado de **backend-cd**, serve como o núcleo de gestão dos serviços da Cidadeclipse, incluindo autenticação, controle de usuários, operações de carrinho de compras e entrega de livros gratuitos.
-
+[Conheça o Frontend do projeto!](https://github.com/lllleao/frontend-cd)
 ---
 
 ## 🧰 Tecnologias e Dependências
