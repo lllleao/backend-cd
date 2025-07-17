@@ -53,14 +53,26 @@ export class AuthController {
 
             return res.status(200).json({ msg: 'Token atualizado' })
         } catch (err) {
-            if (err instanceof jwt.JsonWebTokenError) {
-                console.log('Token mal formado', err.message)
+            if (
+                err instanceof jwt.JsonWebTokenError &&
+                !(err.message === 'jwt expired')
+            ) {
                 throw new BadRequestException({
                     message: 'Token mal formado',
                     error: 'Token mal formado',
                     statusCode: 400
                 })
+            } else if (
+                err instanceof jwt.TokenExpiredError &&
+                err.message === 'jwt expired'
+            ) {
+                throw new BadRequestException({
+                    message: 'Token expirado',
+                    error: 'Token expirado',
+                    statusCode: 400
+                })
             } else {
+                console.log(err)
                 throw new BadRequestException({
                     message: 'Erro desconhecido',
                     error: 'Erro desconhecido',
