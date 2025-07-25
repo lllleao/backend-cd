@@ -4,6 +4,7 @@ import * as cookieParser from 'cookie-parser'
 import helmet from 'helmet'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { join } from 'path'
+import { ValidationPipe } from '@nestjs/common'
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule)
@@ -44,6 +45,14 @@ async function bootstrap() {
         allowedHeaders: ['Content-Type', 'csrf-token', 'authorization'],
         credentials: true
     })
+
+    app.useGlobalPipes(
+        new ValidationPipe({
+            whitelist: true, // remove propriedades não definidas no DTO
+            forbidNonWhitelisted: true, // retorna erro se houver propriedades extras
+            transform: true // transforma os objetos automaticamente em instâncias de classes
+        })
+    )
 
     await app.listen(process.env.PORT ?? 3000, '0.0.0.0')
 }

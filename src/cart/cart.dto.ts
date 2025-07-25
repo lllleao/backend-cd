@@ -1,11 +1,13 @@
+import { Type } from 'class-transformer'
 import {
     IsNotEmpty,
     IsNumber,
-    IsNumberString,
     IsOptional,
     IsString,
     Length,
-    Matches
+    Matches,
+    Min,
+    IsInt
 } from 'class-validator'
 import { Trim } from 'src/common/utils/trim.utils'
 
@@ -14,12 +16,15 @@ export class ItemCartDTP {
     @IsNotEmpty({ message: 'Campo obrigatório' })
     photo: string
 
-    @IsNumberString({}, { message: 'Número inválido' })
+    @Type(() => Number)
     @IsNotEmpty({ message: 'Campo obrigatório' })
+    @Min(1)
     price: number
 
-    @IsNumberString({}, { message: 'Número inválido' })
+    @Type(() => Number)
     @IsNotEmpty({ message: 'Campo obrigatório' })
+    @Min(1)
+    @IsInt()
     quant: number
 
     @IsString({ message: 'A senha deve ser uma string' })

@@ -30,7 +30,7 @@ export class UserService {
                     email
                 }
             })
-
+            console.log(userExist)
             if (userExist) {
                 throw new BadRequestException({
                     message: userExist.email,

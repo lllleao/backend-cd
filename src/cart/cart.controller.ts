@@ -27,7 +27,7 @@ export class CartController {
     async addToCart(@Req() req: Request, @Body() body: ItemCartDTP) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const userId = req['user'].userId as number
-
+        console.log(body)
         try {
             return await this.cartService.addToCart(
                 userId,
