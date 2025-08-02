@@ -10,7 +10,17 @@ export class BooksService {
     }
 
     async findAllStoreBooks() {
-        return await this.prisma.store_book.findMany()
+        const booksStore = await this.prisma.store_book.findMany()
+
+        return booksStore.map((item) => {
+            return {
+                title: item.title,
+                descBooks: item.descBook,
+                photo: item.photo,
+                id: item.id,
+                price: item.price
+            }
+        })
     }
 
     async findSpecificStoreBook(id: number) {

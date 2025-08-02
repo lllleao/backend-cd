@@ -12,8 +12,8 @@ export class BooksController {
     }
 
     @Get('store')
-    async getAllStoreBooks(): Promise<Books[]> {
-        return (await this.booksService.findAllStoreBooks()) as unknown as Books[]
+    async getAllStoreBooks() {
+        return await this.booksService.findAllStoreBooks()
     }
 
     @Get('store/:id')

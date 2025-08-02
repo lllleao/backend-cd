@@ -122,7 +122,7 @@ export class UserService {
 
         const token = await generateJWTToken('1m', user?.email, user?.id)
         const refreshToken = await generateRefreshJWTToken(
-            '7d',
+            '2d',
             user?.email,
             user?.id
         )
