@@ -36,3 +36,11 @@ export interface Books {
     id?: number
     price: number
 }
+
+export interface BooksFromStore extends Omit<Books, 'link'> {
+    title: string
+    descBooks: string
+    photo: string
+    id?: number
+    price: number
+}

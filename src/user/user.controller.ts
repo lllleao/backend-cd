@@ -116,7 +116,7 @@ export class UserController {
     }
 
     @UseGuards(CrsfGuard, JwtGuard)
-    @Post('address')
+    @Post('create-address')
     async postCreateAddress(
         @Req() req: Request,
         @Body() body: CreateAddressDto
