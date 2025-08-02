@@ -17,8 +17,8 @@
         "noImplicitAny": false,
         "strictBindCallApply": false,
         "noFallthroughCasesInSwitch": false,
-        "rootDirs": ["src", "api"],
+        "rootDirs": ["src"],
         "types": ["node"]
     },
-    "include": ["src/**/*", "api/**/*"]
+    "include": ["src/**/*"]
 }
