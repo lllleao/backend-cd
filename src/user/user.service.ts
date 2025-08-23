@@ -30,13 +30,8 @@ export class UserService {
                     email
                 }
             })
-            console.log(userExist)
             if (userExist) {
-                throw new BadRequestException({
-                    message: userExist.email,
-                    error: 'Este email já está em uso.',
-                    statusCode: 400
-                })
+                throw new BadRequestException('Este email já está em uso.')
             }
 
             const salt = await bcrypt.genSalt(10)
@@ -120,9 +115,9 @@ export class UserService {
             })
         }
 
-        const token = await generateJWTToken('1m', user?.email, user?.id)
+        const token = await generateJWTToken('30m', user?.email, user?.id)
         const refreshToken = await generateRefreshJWTToken(
-            '2d',
+            '30m',
             user?.email,
             user?.id
         )

@@ -16,9 +16,6 @@
         "forceConsistentCasingInFileNames": true,
         "noImplicitAny": false,
         "strictBindCallApply": false,
-        "noFallthroughCasesInSwitch": false,
-        "rootDirs": ["src"],
-        "types": ["node"]
-    },
-    "include": ["src/**/*"]
+        "noFallthroughCasesInSwitch": false
+    }
 }

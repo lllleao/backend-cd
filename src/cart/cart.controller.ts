@@ -27,7 +27,6 @@ export class CartController {
     async addToCart(@Req() req: Request, @Body() body: ItemCartDTP) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const userId = req['user'].userId as number
-        console.log(body)
         try {
             return await this.cartService.addToCart(
                 userId,
@@ -37,7 +36,6 @@ export class CartController {
                 body.quant
             )
         } catch (err) {
-            // console.log(err)
             if (err instanceof Prisma.PrismaClientKnownRequestError) {
                 if (err.code === 'P2002') {
                     throw new ConflictException(`Item já existe`)

@@ -30,7 +30,6 @@ export class JwtGuard implements CanActivate {
                 err instanceof jwt.JsonWebTokenError &&
                 !(err.message === 'jwt expired')
             ) {
-                console.log('Token mal formado', err.message)
                 throw new BadRequestException({
                     message: 'Token mal formado',
                     error: 'Token mal formado',
@@ -40,7 +39,6 @@ export class JwtGuard implements CanActivate {
                 err instanceof jwt.JsonWebTokenError &&
                 err.message === 'jwt expired'
             ) {
-                console.log('Token expirado:', err.message)
                 throw new BadRequestException({
                     message: 'Token expirado',
                     error: 'Token expirado',

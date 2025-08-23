@@ -39,7 +39,6 @@ export class AuthController {
     @UseGuards(CrsfGuard)
     async postRefreshToken(@Req() req: Request, @Res() res: Response) {
         const refreshToken = req.cookies.refresh as string
-
         try {
             const token = await this.authService.refreshJWT(refreshToken)
 

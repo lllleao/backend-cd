@@ -25,7 +25,6 @@ export class UserController {
     @Post('signup')
     async signup(@Req() req: Request, @Body() body: SignupDTO) {
         const { email, name, password } = body
-        console.log(email, name, password)
         const token = req.cookies.token as string
 
         if (token) {
@@ -54,7 +53,6 @@ export class UserController {
                     err instanceof jwt.JsonWebTokenError &&
                     !(err.message === 'jwt expired')
                 ) {
-                    console.log('Token mal formado', err.message)
                     throw new BadRequestException({
                         message: 'Token mal formado',
                         error: 'Token mal formado',
@@ -98,12 +96,11 @@ export class UserController {
     @UseGuards(CrsfGuard, JwtGuard)
     @Get('profile')
     async getProfileData(@Req() req: Request) {
-        console.log('fez a req')
-
-        return await this.userService.profileData(
+        const profileData = await this.userService.profileData(
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             req['user'].userId as number
         )
+        return profileData
     }
 
     @UseGuards(CrsfGuard)

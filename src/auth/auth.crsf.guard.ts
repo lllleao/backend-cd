@@ -14,7 +14,6 @@ export class CrsfGuard implements CanActivate {
 
         const token = req.headers['csrf-token'] as string
         if (!token) {
-            console.log('Sem o csrfToken')
             throw new ForbiddenException({
                 message: 'CSRF token ausente no cabeçalho da requisição.',
                 statusCode: 403,
@@ -25,7 +24,6 @@ export class CrsfGuard implements CanActivate {
         const isValid = verifyCsrfToken(token)
 
         if (!isValid) {
-            console.log('O csrfToken não é válido')
             throw new ForbiddenException({
                 message: 'CSRF token inválido ou expirado.',
                 statusCode: 403,

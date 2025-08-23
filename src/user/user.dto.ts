@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer'
+import { Transform, Type } from 'class-transformer'
 import {
     IsBoolean,
     IsEmail,
@@ -16,20 +16,32 @@ export class SignupDTO {
     @IsEmail({}, { message: 'Emial incorreto' })
     @IsNotEmpty({ message: 'Obrigatório' })
     @IsString({ message: 'O e-mail deve ser uma string' })
+    @Matches(/^(?!\s*$).+/, { message: 'O nome não pode ser só espaços' })
+    @Transform(({ value }: { value: string }) => value.trim().toLowerCase())
     email: string
 
     @Trim()
     @IsNotEmpty({ message: 'Obrigatório' })
     @IsString({ message: 'O nome deve ser uma string' })
+    @Matches(/^[A-Za-zÀ-ÿ\s]+$/, {
+        message: 'O nome deve conter apenas letras'
+    })
+    @Matches(/^(?!\s*$).+/, { message: 'O nome não pode ser só espaços' })
+    @Transform(({ value }: { value: string }) =>
+        value
+            .trim()
+            .toLowerCase()
+            .replace(/(^\p{L}|\s\p{L})/gu, (char: string) => char.toUpperCase())
+    )
     name: string
 
-    @Trim()
     @IsString({ message: 'A senha deve ser uma string' })
     @IsNotEmpty({ message: 'Obrigatório' })
     @Matches(/^(?=.*[A-Za-z])(?=.*\d).{8,}$/, {
         message:
             'A senha deve ter pelo menos 8 caracteres, com letras e números'
     })
+    @Matches(/^(?!\s*$).+/, { message: 'O nome não pode ser só espaços' })
     password: string
 }
 
@@ -38,15 +50,14 @@ export class LoginDTO {
     @IsEmail({}, { message: 'Emial incorreto' })
     @IsNotEmpty({ message: 'Obrigatório' })
     @IsString({ message: 'O e-mail deve ser uma string' })
+    @Transform(({ value }: { value: string }) => value.trim().toLowerCase())
+    @Matches(/^(?!\s*$).+/, { message: 'O nome não pode ser só espaços' })
     email: string
 
     @Trim()
     @IsString({ message: 'A senha deve ser uma string' })
     @IsNotEmpty({ message: 'Obrigatório' })
-    @Matches(/^(?=.*[A-Za-z])(?=.*\d).{8,}$/, {
-        message:
-            'A senha deve ter pelo menos 8 caracteres, com letras e números'
-    })
+    @Matches(/^(?!\s*$).+/, { message: 'O nome não pode ser só espaços' })
     password: string
 }
 
@@ -57,6 +68,7 @@ export class AddressDataDto {
     @Matches(/^\d{11}$/, {
         message: 'CPF deve conter exatamente 11 dígitos numéricos'
     })
+    @Matches(/^(?!\s*$).+/, { message: 'O nome não pode ser só espaços' })
     cpf: string
 
     @Trim()

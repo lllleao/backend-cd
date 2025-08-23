@@ -19,7 +19,6 @@ export const generateJWTToken = (
             { expiresIn: tokenExpiresIn },
             (err, token) => {
                 if (err) {
-                    console.log(err, 'token')
                     return reject(err)
                 }
                 resolve(token as string)
@@ -45,7 +44,6 @@ export const generateRefreshJWTToken = (
             { expiresIn: tokenExpiresIn },
             (err, refresh) => {
                 if (err) {
-                    console.log(err, 'refresh')
                     return reject(err)
                 }
                 resolve(refresh as string)

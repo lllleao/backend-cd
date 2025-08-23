@@ -7,7 +7,6 @@ import { generateJWTToken } from './utils/jwt.utils'
 export class AuthService {
     generateCsrfToken() {
         const { token } = generateCsrfToken()
-        // console.log('')
         return token
     }
 
@@ -17,7 +16,7 @@ export class AuthService {
             email: string
             userId: number
         }
-        const token = await generateJWTToken('1m', email, userId)
+        const token = await generateJWTToken('30m', email, userId)
         return token
     }
 }
