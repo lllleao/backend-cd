@@ -16,7 +16,7 @@ export class SignupDTO {
     @IsEmail({}, { message: 'Emial incorreto' })
     @IsNotEmpty({ message: 'Obrigatório' })
     @IsString({ message: 'O e-mail deve ser uma string' })
-    @Matches(/^(?!\s*$).+/, { message: 'O nome não pode ser só espaços' })
+    @Matches(/^(?!\s*$).+/, { message: 'O campo não pode ser só espaços' })
     @Transform(({ value }: { value: string }) => value.trim().toLowerCase())
     email: string
 

@@ -9,11 +9,12 @@ import {
     UseGuards
 } from '@nestjs/common'
 import { CrsfGuard } from 'src/auth/auth.crsf.guard'
-import { ContactDto } from 'src/auth/contact.dto'
+import { ContactDto } from 'src/emial/contact.dto'
 import { EmailService } from './email.service'
 import { Response } from 'express'
 import results from './utils/confirm.utils'
 import { join } from 'path'
+import { formatPhoneNumber } from 'src/auth/utils/formatPhone'
 
 @Controller('email')
 export class EmailController {
@@ -22,14 +23,14 @@ export class EmailController {
     @Post('send')
     @UseGuards(CrsfGuard)
     async postSendEmail(@Body() emailInfo: ContactDto): Promise<any> {
-        const { emailUser, name, text, number } = emailInfo
-
+        const { emailUser, name, text, phone } = emailInfo
+        const phoneFormated = formatPhoneNumber(phone)
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: process.env.EMAIL_USER,
             replyTo: emailUser,
             subject: 'Contato site',
-            html: `<h2>${name} - ${emailUser}</h2><br/><br/><h3>${text}</h3><br/><h4>Telefone: ${number}</h4>`
+            html: `<h2>${name} - ${emailUser}</h2><br/><br/><h3>${text}</h3><br/><h4>Telefone: ${phoneFormated}</h4>`
         }
 
         try {
