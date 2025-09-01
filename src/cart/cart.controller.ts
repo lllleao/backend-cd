@@ -11,12 +11,12 @@ import {
     Req,
     UseGuards
 } from '@nestjs/common'
-import { CrsfGuard } from 'src/auth/auth.crsf.guard'
-import { JwtGuard } from 'src/auth/auth.jwt.guard'
+import { CrsfGuard } from '../auth/auth.crsf.guard'
+import { JwtGuard } from '../auth/auth.jwt.guard'
 import { ItemCartDTP, UpdataPriceDTO } from './cart.dto'
 import { CartService } from './cart.service'
 import { Request } from 'express'
-import { Prisma } from 'generated/prisma'
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
 @Controller('cart')
 export class CartController {
@@ -36,7 +36,7 @@ export class CartController {
                 body.quant
             )
         } catch (err) {
-            if (err instanceof Prisma.PrismaClientKnownRequestError) {
+            if (err instanceof PrismaClientKnownRequestError) {
                 if (err.code === 'P2002') {
                     throw new ConflictException(`Item já existe`)
                 }

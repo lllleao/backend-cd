@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import SMTPTransport, { Options } from 'nodemailer/lib/smtp-transport'
-import transporter from 'src/auth/utils/email.transporter'
+import transporter from '../auth/utils/email.transporter'
 import verifyJwtToken from './utils/email.veriryJWT'
-import { PrismaService } from 'src/prisma/prisma.service'
+import { PrismaService } from '../prisma/prisma.service'
 import { ResultKeys } from './utils/confirm.utils'
 
 @Injectable()

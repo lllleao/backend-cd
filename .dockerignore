@@ -1,0 +1,20 @@
+# Dependências locais
+node_modules
+npm-debug.log
+yarn.lock
+pnpm-lock.yaml
+.vscode
+generated
+
+# Build output
+dist
+
+# Configs locais
+.env
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# VCS
+.git
+.gitignore
