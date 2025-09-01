@@ -4,13 +4,13 @@ import {
     Injectable,
     InternalServerErrorException
 } from '@nestjs/common'
-import { PrismaService } from 'src/prisma/prisma.service'
+import { PrismaService } from '../prisma/prisma.service'
 import * as bcrypt from 'bcrypt'
 import {
     generateJWTToken,
     generateRefreshJWTToken
-} from 'src/auth/utils/jwt.utils'
-import { EmailService } from 'src/emial/email.service'
+} from '../auth/utils/jwt.utils'
+import { EmailService } from '../emial/email.service'
 import { CreateAddressDto } from './user.dto'
 
 @Injectable()

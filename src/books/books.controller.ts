@@ -1,6 +1,6 @@
 import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common'
 import { BooksService } from './books.service'
-import { Books, BookSpecific } from 'src/common/types'
+import { Books, BookSpecific } from '../common/types'
 
 @Controller('books')
 export class BooksController {

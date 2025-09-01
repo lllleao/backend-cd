@@ -8,13 +8,13 @@ import {
     Res,
     UseGuards
 } from '@nestjs/common'
-import { CrsfGuard } from 'src/auth/auth.crsf.guard'
-import { ContactDto } from 'src/emial/contact.dto'
+import { CrsfGuard } from '../auth/auth.crsf.guard'
+import { ContactDto } from '../emial/contact.dto'
 import { EmailService } from './email.service'
 import { Response } from 'express'
 import results from './utils/confirm.utils'
 import { join } from 'path'
-import { formatPhoneNumber } from 'src/auth/utils/formatPhone'
+import { formatPhoneNumber } from '../auth/utils/formatPhone'
 
 @Controller('email')
 export class EmailController {

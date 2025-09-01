@@ -9,7 +9,7 @@ import {
     Matches,
     ValidateNested
 } from 'class-validator'
-import { Trim } from 'src/common/utils/trim.utils'
+import { Trim } from '../common/utils/trim.utils'
 
 export class SignupDTO {
     @Trim()

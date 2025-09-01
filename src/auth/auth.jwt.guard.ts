@@ -4,7 +4,7 @@ import {
     ExecutionContext,
     Injectable
 } from '@nestjs/common'
-import { AuthenticatedRequest } from 'src/common/types'
+import { AuthenticatedRequest } from '../common/types'
 import * as jwt from 'jsonwebtoken'
 
 @Injectable()
