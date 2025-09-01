@@ -46,3 +46,44 @@ Todas as seguintes funcionalidades estão sendo desenvolvidas e ainda não estã
 Utiliza **MySQL** gerenciado por **Prisma**, com esquema organizado em tabelas para usuários, tokens, carrinho, pedidos, itens de pedidos, e livros disponíveis.
 
 ---
+
+## 🐳 Como Rodar com Docker
+
+1. Clonar o repositório:
+
+```shell
+git clone https://github.com/lllleao/backend-cd.git
+cd backend-cd
+```
+
+2. Buildar e subir os containers:
+
+```shell
+docker-compose up --build -d
+```
+
+3. Acompanhar os logs do backend:
+
+```shell
+docker-compose logs -f backend
+```
+
+4. Derrubar os containers:
+```shell
+docker-compose down
+```
+
+🌐 Acesso
+
+Backend disponível em: http://localhost:3000
+
+Banco de dados MySQL também é iniciado pelo docker-compose.
+
+## ⚡ Alternativa sem Docker
+```shell
+git clone https://github.com/lllleao/backend-cd.git
+cd backend-cd
+npm install
+npx prisma generate
+npm run start:dev
+```
