@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+    api:
+        build: .
+        container_name: nest-api
+        ports:
+            - '3000:3000' # opcional: acesso direto sem passar pelo nginx
+        env_file:
+            - .env
+        restart: unless-stopped
+
+    nginx:
+        image: nginx:latest
+        container_name: nginx
+        restart: unless-stopped
+        ports:
+            - '80:80'
+        volumes:
+            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+        depends_on:
+            - api
