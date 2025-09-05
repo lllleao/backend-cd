@@ -74,22 +74,25 @@ export class UserController {
             password
         )
 
+        const isProduction = process.env.PRODUCTION === 'production'
+
         res.cookie('token', token, {
             path: '/',
             httpOnly: true,
-            sameSite: 'lax', // none
-            // secure: true, TROCAR PARA ALKGO SEGURO DEPOIS
-            maxAge: 3600000
+            sameSite: isProduction ? 'none' : 'lax',
+            secure: isProduction,
+            maxAge: 3600000,
+            domain: isProduction ? 'https://64.181.171.109' : undefined
         })
 
         res.cookie('refresh', refreshToken, {
             path: '/auth/refresh',
             httpOnly: true,
-            sameSite: 'lax', // none
-            // secure: true, TROCAR PARA ALKGO SEGURO DEPOIS
-            maxAge: 604800000
+            sameSite: isProduction ? 'none' : 'lax',
+            secure: isProduction,
+            maxAge: 604800000,
+            domain: isProduction ? 'https://64.181.171.109' : undefined
         })
-
         return res.status(200).json({ success: true })
     }
 
