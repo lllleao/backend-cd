@@ -3,8 +3,8 @@ services:
     api:
         build: .
         container_name: nest-api
-        expose:
-            - '3000' # visível só para o host/nginx
+        ports:
+            - '3000:3000'
         env_file:
             - .env
         restart: unless-stopped
