@@ -8,6 +8,7 @@ export class BooksController {
 
     @Get('free')
     async getAllFreeBooks(): Promise<Books[]> {
+        console.log('ola')
         return (await this.booksService.findAllFreeBooks()) as unknown as Books[]
     }
 

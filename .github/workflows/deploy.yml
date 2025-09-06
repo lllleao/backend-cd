@@ -1,0 +1,33 @@
+name: Deploy to Oracle VM
+
+on:
+    push:
+        tags:
+            - 'deploy-*'
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Run lint
+              run: npm run lint
+
+            - name: Setup SSH
+              uses: webfactory/ssh-agent@v0.7.0
+              with:
+                  ssh-private-key: ${{ secrets.SSH_KEY }}
+
+            - name: Deploy to VM
+              run: |
+                  ssh -o StrictHostKeyChecking=no usuario@IP_DA_VM "
+                    cd /projeto/backend-cd
+                    git pull origin main
+                    docker-compose down
+                    sudo docker-compose -f docker-compose.prod.yml up -d --build
+                  "
