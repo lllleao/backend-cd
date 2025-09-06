@@ -92,8 +92,7 @@ export class CartController {
     @Post('create-purchase')
     @UseGuards(CrsfGuard, JwtGuard)
     postCreatePurchse(@Req() req: Request, @Body() body: UpdataPriceDTO) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const userId = req['user'].userId as number
+        // const userId = req['user'].userId as number
 
         console.log(body)
     }
