@@ -5,8 +5,19 @@ import { PrismaService } from '../prisma/prisma.service'
 export class BooksService {
     constructor(private prisma: PrismaService) {}
 
-    async findAllFreeBooks() {
-        return await this.prisma.public_book.findMany()
+    async findFreeBooks(take: number, skip: number) {
+        const books = await this.prisma.public_book.findMany({
+            take,
+            skip
+        })
+
+        return books
+    }
+
+    async findAllFreeBooksLength() {
+        const booksLength = await this.prisma.public_book.findMany()
+
+        return booksLength
     }
 
     async findAllStoreBooks() {

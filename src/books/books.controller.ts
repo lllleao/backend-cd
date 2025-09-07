@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common'
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common'
 import { BooksService } from './books.service'
 import { Books, BookSpecific } from '../common/types'
 
@@ -7,9 +7,19 @@ export class BooksController {
     constructor(private booksService: BooksService) {}
 
     @Get('free')
+    async getFreeBooksPage(
+        @Query('take', ParseIntPipe) take: number,
+        @Query('skip', ParseIntPipe) skip: number
+    ): Promise<Books[]> {
+        return (await this.booksService.findFreeBooks(
+            take,
+            skip
+        )) as unknown as Books[]
+    }
+
+    @Get('free-length')
     async getAllFreeBooks(): Promise<Books[]> {
-        console.log('hello!')
-        return (await this.booksService.findAllFreeBooks()) as unknown as Books[]
+        return (await this.booksService.findAllFreeBooksLength()) as unknown as Books[]
     }
 
     @Get('store')
