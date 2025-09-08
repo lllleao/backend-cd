@@ -18,3 +18,4 @@ docker-compose.yml
 # VCS
 .git
 .gitignore
+*.log
