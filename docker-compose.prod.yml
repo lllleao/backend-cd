@@ -7,6 +7,6 @@ services:
         image: gru.ocir.io/grs29rbpghiq/backend-cd:latest
         ports:
             - '3000:3000'
-        env_file::
+        env_file:
             - .env
         restart: always
