@@ -95,7 +95,7 @@ jobs:
                       docker login gru.ocir.io -u "${{ secrets.OCIR_USERNAME }}" --password "${{ secrets.OCIR_TOKEN }}"
                       cd /home/ubuntu/projeto/backend-cd
                       sudo docker compose -f docker-compose.prod.yml pull
-                      sudo docker compose -f docker-compose.prod.yml up -d
+                      sudo docker compose -f docker-compose.prod.yml up -d --no-build
 
             - name: Remover IP da Security List (preservando regras)
               if: always()
