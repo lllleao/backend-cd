@@ -18,6 +18,15 @@ jobs:
             - name: Run lint
               run: npm run lint
 
+            - name: Obter IP público do runner
+              id: ip
+              uses: haythem/public-ip@v1.2
+
+            - name: Exibir IP no log
+              run: |
+                  echo "IPv4 do runner: ${{ steps.ip.outputs.ipv4 }}"
+                  echo "IPv6 do runner: ${{ steps.ip.outputs.ipv6 }}"
+
             - name: Login no OCIR
               run: echo "${{ secrets.OCIR_TOKEN }}" | docker login gru.ocir.io -u "${{ secrets.OCIR_USERNAME }}" --password-stdin
 
