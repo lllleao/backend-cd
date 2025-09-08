@@ -106,7 +106,7 @@ jobs:
                   --query 'data."ingress-security-rules"' \
                   --output json > all_rules.json
 
-                  jq "[.[] | select(.source != \"${{ steps.ip.outputs.ipv4 }}/32\")]" all_rules.json > filtered_rules.json
+                  jq --arg ip "${{ steps.ip.outputs.ipv4 }}" '[.[] | select(.source | contains($ip) | not)]' all_rules.json > filtered_rules.json
 
                   oci network security-list update \
                   --security-list-id ${{ secrets.OCI_SECURITY_LIST_ID }} \
