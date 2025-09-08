@@ -68,7 +68,8 @@ jobs:
 
                   oci network security-list update \
                   --security-list-id ${{ secrets.OCI_SECURITY_LIST_ID }} \
-                  --ingress-security-rules file://updated_rules.json
+                  --ingress-security-rules file://updated_rules.json \
+                  --force
 
             - name: Login no OCIR
               run: echo "${{ secrets.OCIR_TOKEN }}" | docker login gru.ocir.io -u "${{ secrets.OCIR_USERNAME }}" --password-stdin
@@ -109,4 +110,5 @@ jobs:
 
                   oci network security-list update \
                   --security-list-id ${{ secrets.OCI_SECURITY_LIST_ID }} \
-                  --ingress-security-rules file://filtered_rules.json
+                  --ingress-security-rules file://filtered_rules.json \
+                  --force
