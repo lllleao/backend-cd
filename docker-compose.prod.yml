@@ -4,16 +4,6 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-            args:
-                DATABASE_URL: ${DATABASE_URL}
-                PORT: ${PORT}
-                ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
-                CSRF_SECRET: ${CSRF_SECRET}
-                JWT_SECRET: ${JWT_SECRET}
-                JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
-                EMAIL_USER: ${EMAIL_USER}
-                EMAIL_PASS: ${EMAIL_PASS}
-                PRODUCTION: ${PRODUCTION}
         image: gru.ocir.io/grs29rbpghiq/backend-cd:latest
         ports:
             - '3000:3000'
