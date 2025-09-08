@@ -80,10 +80,10 @@ jobs:
                   echo "ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }}" >> .env
 
             - name: Build da imagem
-              run: docker compose -f docker-compose.prod.yml build
+              run: docker build -t gru.ocir.io/grs29rbpghiq/backend-cd:latest .
 
             - name: Push da imagem
-              run: docker compose -f docker-compose.prod.yml push
+              run: docker push gru.ocir.io/grs29rbpghiq/backend-cd:latest
 
             - name: Deploy remoto via SSH
               uses: appleboy/ssh-action@v0.1.10
@@ -92,7 +92,7 @@ jobs:
                   username: ${{ secrets.VM_USER }}
                   key: ${{ secrets.SSH_KEY }}
                   script: |
-                      docker login gru.ocir.io -u "${{ secrets.OCIR_USERNAME }}" --password "${{ secrets.OCIR_TOKEN }}"
+                      echo "${{ secrets.OCIR_TOKEN }}" | docker login gru.ocir.io -u "${{ secrets.OCIR_USERNAME }}" --password-stdin
                       cd /home/ubuntu/projeto/backend-cd
                       sudo docker compose -f docker-compose.prod.yml pull
                       sudo docker compose -f docker-compose.prod.yml up -d --no-build
