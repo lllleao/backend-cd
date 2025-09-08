@@ -32,7 +32,7 @@ jobs:
               with:
                   host: ${{ secrets.VM_HOST }}
                   username: ${{ secrets.VM_USER }}
-                  key: ${{ secrets.VM_SSH_KEY }}
+                  key: ${{ secrets.SSH_KEY }}
                   script: |
                       docker login gru.ocir.io -u "${{ secrets.OCIR_USERNAME }}" --password "${{ secrets.OCIR_TOKEN }}"
                       cd /home/ubuntu/projeto/backend-cd
