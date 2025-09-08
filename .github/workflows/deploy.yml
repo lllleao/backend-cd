@@ -18,16 +18,23 @@ jobs:
             - name: Run lint
               run: npm run lint
 
-            - name: Setup SSH
-              uses: webfactory/ssh-agent@v0.7.0
-              with:
-                  ssh-private-key: ${{ secrets.SSH_KEY }}
+            - name: Login no OCIR
+              run: echo "${{ secrets.OCIR_TOKEN }}" | docker login gru.ocir.io -u "${{ secrets.OCIR_USERNAME }}" --password-stdin
 
-            - name: Deploy to VM
-              run: |
-                  ssh -o StrictHostKeyChecking=no ubuntu@64.181.171.109 "
-                    cd /home/ubuntu/projeto/backend-cd
-                    git pull origin main
-                    docker-compose down
-                    sudo docker-compose -f docker-compose.prod.yml up -d --build
-                  "
+            - name: Build da imagem
+              run: docker-compose -f docker-compose.prod.yml build
+
+            - name: Push da imagem
+              run: docker-compose -f docker-compose.prod.yml push
+
+            - name: Deploy remoto via SSH
+              uses: appleboy/ssh-action@v0.1.10
+              with:
+                  host: ${{ secrets.VM_HOST }}
+                  username: ${{ secrets.VM_USER }}
+                  key: ${{ secrets.VM_SSH_KEY }}
+                  script: |
+                      docker login gru.ocir.io -u "${{ secrets.OCIR_USERNAME }}" --password "${{ secrets.OCIR_TOKEN }}"
+                      cd /home/ubuntu/projeto/backend-cd
+                      docker-compose -f docker-compose.prod.yml pull
+                      docker-compose -f docker-compose.prod.yml up -d
