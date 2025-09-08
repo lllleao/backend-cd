@@ -25,11 +25,14 @@ jobs:
             - name: Instalar OCI CLI
               run: |
                   curl -sL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash -s -- --accept-all-defaults
-                  echo 'export PATH=$HOME/bin:$PATH' >> ~/.bashrc
-                  source ~/.bashrc
+                  echo "PATH=$HOME/bin:$PATH" >> $GITHUB_ENV
                   mkdir -p ~/.oci
                   echo "${{ secrets.OCI_CONFIG_FILE }}" > ~/.oci/config
                   chmod 600 ~/.oci/config
+
+            - name: Verificar OCI CLI
+              run: oci --version
+
             - name: Adicionar IP à Security List
               run: |
                   echo "Adicionando IP ${{ steps.ip.outputs.ipv4 }} à Security List..."
