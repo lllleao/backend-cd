@@ -22,10 +22,42 @@ jobs:
               id: ip
               uses: haythem/public-ip@v1.2
 
-            - name: Exibir IP no log
+            - name: Instalar OCI CLI
               run: |
-                  echo "IPv4 do runner: ${{ steps.ip.outputs.ipv4 }}"
-                  echo "IPv6 do runner: ${{ steps.ip.outputs.ipv6 }}"
+                  curl -sL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash -s -- --accept-all-defaults
+                  echo 'export PATH=$HOME/bin:$PATH' >> $GITHUB_ENV
+                  mkdir -p ~/.oci
+                  echo "${{ secrets.OCI_CONFIG_FILE }}" > ~/.oci/config
+                  chmod 600 ~/.oci/config
+
+            - name: Adicionar IP à Security List
+              run: |
+                  echo "Adicionando IP ${{ steps.ip.outputs.ipv4 }} à Security List..."
+                  oci network security-list get \
+                  --security-list-id ${{ secrets.OCI_SECURITY_LIST_ID }} \
+                  --query "data.ingress-security-rules" \
+                  --output json > current_rules.json
+
+                  jq "[.[]] + [{
+                  \"protocol\": \"6\",
+                  \"source\": \"${{ steps.ip.outputs.ipv4 }}/32\",
+                  \"sourceType\": \"CIDR_BLOCK\",
+                  \"tcpOptions\": {
+                      \"destinationPortRange\": {
+                      \"min\": 22,
+                      \"max\": 22
+                      }
+                  },
+                  \"isStateless\": false,
+                  \"description\": \"GitHub Actions temporary SSH access\"
+                  }]" current_rules.json > updated_rules.json
+
+                  echo "Regras atualizadas:"
+                  cat updated_rules.json | jq .
+
+                  oci network security-list update \
+                  --security-list-id ${{ secrets.OCI_SECURITY_LIST_ID }} \
+                  --ingress-security-rules file://updated_rules.json
 
             - name: Login no OCIR
               run: echo "${{ secrets.OCIR_TOKEN }}" | docker login gru.ocir.io -u "${{ secrets.OCIR_USERNAME }}" --password-stdin
@@ -52,3 +84,18 @@ jobs:
                       cd /home/ubuntu/projeto/backend-cd
                       sudo docker compose -f docker-compose.prod.yml pull
                       sudo docker compose -f docker-compose.prod.yml up -d
+
+            - name: Remover IP da Security List (preservando regras)
+              if: always()
+              run: |
+                  echo "Removendo IP ${{ steps.ip.outputs.ipv4 }} da Security List..."
+                  oci network security-list get \
+                  --security-list-id ${{ secrets.OCI_SECURITY_LIST_ID }} \
+                  --query "data.ingress-security-rules" \
+                  --output json > all_rules.json
+
+                  jq "[.[] | select(.source != \"${{ steps.ip.outputs.ipv4 }}/32\")]" all_rules.json > filtered_rules.json
+
+                  oci network security-list update \
+                  --security-list-id ${{ secrets.OCI_SECURITY_LIST_ID }} \
+                  --ingress-security-rules file://filtered_rules.json
