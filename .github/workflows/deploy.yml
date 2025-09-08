@@ -80,10 +80,10 @@ jobs:
                   echo "ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }}" >> .env
 
             - name: Build da imagem
-              run: docker build -t gru.ocir.io/grs29rbpghiq/backend-cd:latest .
+              run: docker compose -f docker-compose.prod.yml build
 
             - name: Push da imagem
-              run: docker push gru.ocir.io/grs29rbpghiq/backend-cd:latest
+              run: docker compose -f docker-compose.prod.yml push
 
             - name: Deploy remoto via SSH
               uses: appleboy/ssh-action@v0.1.10
