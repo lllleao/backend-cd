@@ -22,10 +22,10 @@ jobs:
               run: echo "${{ secrets.OCIR_TOKEN }}" | docker login gru.ocir.io -u "${{ secrets.OCIR_USERNAME }}" --password-stdin
 
             - name: Build da imagem
-              run: docker-compose -f docker-compose.prod.yml build
+              run: docker compose -f docker-compose.prod.yml build
 
             - name: Push da imagem
-              run: docker-compose -f docker-compose.prod.yml push
+              run: docker compose -f docker-compose.prod.yml push
 
             - name: Deploy remoto via SSH
               uses: appleboy/ssh-action@v0.1.10
@@ -36,5 +36,5 @@ jobs:
                   script: |
                       docker login gru.ocir.io -u "${{ secrets.OCIR_USERNAME }}" --password "${{ secrets.OCIR_TOKEN }}"
                       cd /home/ubuntu/projeto/backend-cd
-                      docker-compose -f docker-compose.prod.yml pull
-                      docker-compose -f docker-compose.prod.yml up -d
+                      sudo docker compose -f docker-compose.prod.yml pull
+                      sudo docker compose -f docker-compose.prod.yml up -d
