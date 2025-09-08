@@ -27,6 +27,14 @@ jobs:
                   curl -sL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash -s -- --accept-all-defaults
                   echo "PATH=$HOME/bin:$PATH" >> $GITHUB_ENV
                   mkdir -p ~/.oci
+
+            - name: Criar chave privada OCI
+              run: |
+                  echo "${{ secrets.OCI_API_KEY }}" > ~/.oci/oci_api_key.pem
+                  chmod 600 ~/.oci/oci_api_key.pem
+
+            - name: Criar arquivo de configuração OCI
+              run: |
                   echo "${{ secrets.OCI_CONFIG_FILE }}" > ~/.oci/config
                   chmod 600 ~/.oci/config
 
