@@ -25,17 +25,17 @@ jobs:
             - name: Instalar OCI CLI
               run: |
                   curl -sL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash -s -- --accept-all-defaults
-                  echo 'export PATH=$HOME/bin:$PATH' >> $GITHUB_ENV
+                  echo 'export PATH=$HOME/bin:$PATH' >> ~/.bashrc
+                  source ~/.bashrc
                   mkdir -p ~/.oci
                   echo "${{ secrets.OCI_CONFIG_FILE }}" > ~/.oci/config
                   chmod 600 ~/.oci/config
-
             - name: Adicionar IP à Security List
               run: |
                   echo "Adicionando IP ${{ steps.ip.outputs.ipv4 }} à Security List..."
                   oci network security-list get \
                   --security-list-id ${{ secrets.OCI_SECURITY_LIST_ID }} \
-                  --query "data.ingress-security-rules" \
+                  --query 'data."ingress-security-rules"' \
                   --output json > current_rules.json
 
                   jq "[.[]] + [{
@@ -91,7 +91,7 @@ jobs:
                   echo "Removendo IP ${{ steps.ip.outputs.ipv4 }} da Security List..."
                   oci network security-list get \
                   --security-list-id ${{ secrets.OCI_SECURITY_LIST_ID }} \
-                  --query "data.ingress-security-rules" \
+                  --query 'data."ingress-security-rules"' \
                   --output json > all_rules.json
 
                   jq "[.[] | select(.source != \"${{ steps.ip.outputs.ipv4 }}/32\")]" all_rules.json > filtered_rules.json
