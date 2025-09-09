@@ -1,9 +1,7 @@
 name: Deploy to Oracle VM
 
 on:
-    push:
-        tags:
-            - 'deploy-*'
+    workflow_dispatch:
 
 jobs:
     deploy:
