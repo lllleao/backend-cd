@@ -96,6 +96,7 @@ jobs:
                       cd /home/ubuntu/projeto/backend-cd
                       sudo docker compose -f docker-compose.prod.yml pull
                       sudo docker compose -f docker-compose.prod.yml up -d --no-build
+                      sudo docker system prune -af
 
             - name: Remover IP da Security List (preservando regras)
               if: always()
