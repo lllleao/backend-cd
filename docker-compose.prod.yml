@@ -3,7 +3,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        image: gru.ocir.io/grs29rbpghiq/cidadeclipse/backend-cd:latest
+        image: gru.ocir.io/grs29rbpghiq/backend-cd:latest
         ports:
             - '3000:3000'
         env_file:
