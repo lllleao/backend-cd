@@ -1,7 +1,9 @@
 name: Deploy to Oracle VM
 
 on:
-    workflow_dispatch:
+    push:
+        tags:
+            - 'deploy-*'
 
 jobs:
     deploy:
@@ -77,10 +79,11 @@ jobs:
                   echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
                   echo "ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }}" >> .env
 
-            - name: Build e push Docker
-              run: |
-                  docker build -t gru.ocir.io/grs29rbpghiq/backend-cd:latest .
-                  docker push gru.ocir.io/grs29rbpghiq/backend-cd:latest
+            - name: Build da imagem
+              run: docker compose -f docker-compose.prod.yml build
+
+            - name: Push da imagem
+              run: docker compose -f docker-compose.prod.yml push
 
             - name: Deploy remoto via SSH
               uses: appleboy/ssh-action@v0.1.10
