@@ -11,7 +11,6 @@ export class BooksController {
         @Query('take', ParseIntPipe) take: number,
         @Query('skip', ParseIntPipe) skip: number
     ): Promise<Books[]> {
-        console.log('teste deploy')
         return (await this.booksService.findFreeBooks(
             take,
             skip

@@ -8,7 +8,10 @@ export class BooksService {
     async findFreeBooks(take: number, skip: number) {
         const books = await this.prisma.public_book.findMany({
             take,
-            skip
+            skip,
+            orderBy: {
+                id: 'desc'
+            }
         })
 
         return books
