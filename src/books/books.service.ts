@@ -18,7 +18,11 @@ export class BooksService {
     }
 
     async findAllFreeBooksLength() {
-        const booksLength = await this.prisma.public_book.findMany()
+        const booksLength = await this.prisma.public_book.findMany({
+            orderBy: {
+                id: 'desc'
+            }
+        })
 
         return booksLength
     }
