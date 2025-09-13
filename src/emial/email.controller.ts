@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import {
     Body,
     Controller,
@@ -15,6 +16,7 @@ import { Response } from 'express'
 import results from './utils/confirm.utils'
 import { join } from 'path'
 import { formatPhoneNumber } from '../auth/utils/formatPhone'
+import { Throttle } from '@nestjs/throttler'
 
 @Controller('email')
 export class EmailController {
@@ -22,6 +24,7 @@ export class EmailController {
 
     @Post('send')
     @UseGuards(CrsfGuard)
+    @Throttle({ login: { ttl: 60000, limit: 5 } })
     async postSendEmail(@Body() emailInfo: ContactDto): Promise<any> {
         const { emailUser, name, text, phone } = emailInfo
         const phoneFormated = formatPhoneNumber(phone)
@@ -50,6 +53,7 @@ export class EmailController {
     }
 
     @Get('confirm')
+    @Throttle({ login: { ttl: 60000, limit: 5 } })
     async getConfirmEmail(@Res() res: Response, @Query('token') token: string) {
         try {
             const resultEmail = await this.emailService.confirmEmail(token)

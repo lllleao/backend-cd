@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import {
     BadRequestException,
     Body,
@@ -15,13 +16,15 @@ import { Request, Response } from 'express'
 import { JwtGuard } from '../auth/auth.jwt.guard'
 import * as jwt from 'jsonwebtoken'
 import { checkTokenFront } from './utils/user.utils'
+import { Throttle } from '@nestjs/throttler'
 
 @Controller('user')
 export class UserController {
     constructor(private userService: UserService) {}
 
-    @UseGuards(CrsfGuard)
     @Post('signup')
+    @UseGuards(CrsfGuard)
+    @Throttle({ login: { ttl: 60000, limit: 5 } })
     async signup(@Req() req: Request, @Body() body: SignupDTO) {
         const { email, name, password } = body
         const token = req.cookies.token as string
@@ -33,8 +36,9 @@ export class UserController {
         return await this.userService.createUser(password, email, name)
     }
 
-    @UseGuards(CrsfGuard)
     @Post('login')
+    @UseGuards(CrsfGuard)
+    @Throttle({ login: { ttl: 60000, limit: 5 } })
     async login(
         @Body() body: LoginDTO,
         @Req() req: Request,
@@ -94,8 +98,9 @@ export class UserController {
         return res.status(200).json({ success: true })
     }
 
-    @UseGuards(CrsfGuard, JwtGuard)
     @Get('profile')
+    @UseGuards(CrsfGuard, JwtGuard)
+    @Throttle({ default: { ttl: 60000, limit: 100 } })
     async getProfileData(@Req() req: Request) {
         const profileData = await this.userService.profileData(
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -104,8 +109,9 @@ export class UserController {
         return profileData
     }
 
-    @UseGuards(CrsfGuard)
     @Post('logout')
+    @UseGuards(CrsfGuard)
+    @Throttle({ login: { ttl: 60000, limit: 5 } })
     logout(@Res() res: Response) {
         res.clearCookie('token')
         res.clearCookie('refresh')
@@ -113,8 +119,9 @@ export class UserController {
         res.status(200).json({ msg: 'Logout realizado' })
     }
 
-    @UseGuards(CrsfGuard, JwtGuard)
     @Post('create-address')
+    @Throttle({ login: { ttl: 60000, limit: 10 } })
+    @UseGuards(CrsfGuard, JwtGuard)
     async postCreateAddress(
         @Req() req: Request,
         @Body() body: CreateAddressDto
@@ -151,8 +158,9 @@ export class UserController {
         return { success: true }
     }
 
-    @UseGuards(CrsfGuard, JwtGuard)
     @Get('get-address')
+    @UseGuards(CrsfGuard, JwtGuard)
+    @Throttle({ default: { ttl: 60000, limit: 100 } })
     async getAddress(@Req() req: Request) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const userId = req['user'].userId as number

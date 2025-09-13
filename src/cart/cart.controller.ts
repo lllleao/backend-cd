@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import {
     Body,
     ConflictException,
@@ -17,6 +18,7 @@ import { ItemCartDTP, PurchaseDataDTO, UpdataPriceDTO } from './cart.dto'
 import { CartService } from './cart.service'
 import { Request } from 'express'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+import { Throttle } from '@nestjs/throttler'
 
 @Controller('cart')
 export class CartController {
@@ -24,6 +26,7 @@ export class CartController {
 
     @Post('add')
     @UseGuards(CrsfGuard, JwtGuard)
+    @Throttle({ login: { ttl: 60000, limit: 30 } })
     async addToCart(@Req() req: Request, @Body() body: ItemCartDTP) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const userId = req['user'].userId as number
@@ -46,6 +49,7 @@ export class CartController {
 
     @Get('items')
     @UseGuards(CrsfGuard, JwtGuard)
+    @Throttle({ login: { ttl: 60000, limit: 100 } })
     async getItemsCart(@Req() req: Request) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const userId = req['user'].userId as number
@@ -55,6 +59,7 @@ export class CartController {
 
     @Delete('delete/:id')
     @UseGuards(CrsfGuard, JwtGuard)
+    @Throttle({ login: { ttl: 60000, limit: 30 } })
     async deleteItemCart(
         @Req() req: Request,
         @Param('id', ParseIntPipe) id: number
@@ -67,6 +72,7 @@ export class CartController {
 
     @Get('total-price')
     @UseGuards(CrsfGuard, JwtGuard)
+    @Throttle({ default: { ttl: 60000, limit: 100 } })
     async getTotalPrice(@Req() req: Request) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const userId = req['user'].userId as number
@@ -76,6 +82,7 @@ export class CartController {
 
     @Patch('update-price')
     @UseGuards(CrsfGuard, JwtGuard)
+    @Throttle({ login: { ttl: 60000, limit: 30 } })
     async patchTotalPrice(@Req() req: Request, @Body() body: UpdataPriceDTO) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const userId = req['user'].userId as number
@@ -92,6 +99,7 @@ export class CartController {
 
     @Post('create-purchase')
     @UseGuards(CrsfGuard, JwtGuard)
+    @Throttle({ login: { ttl: 60000, limit: 3 } })
     postCreatePurchse(@Req() req: Request, @Body() body: PurchaseDataDTO) {
         // const userId = req['user'].userId as number
 
