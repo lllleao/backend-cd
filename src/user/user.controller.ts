@@ -13,7 +13,6 @@ import { UserService } from './user.service'
 import { CrsfGuard } from '../auth/auth.crsf.guard'
 import { Request, Response } from 'express'
 import { JwtGuard } from '../auth/auth.jwt.guard'
-import cpfValidator from './utils/cpfValidator'
 import * as jwt from 'jsonwebtoken'
 import { checkTokenFront } from './utils/user.utils'
 
@@ -75,7 +74,6 @@ export class UserController {
         )
 
         const isProduction = process.env.PRODUCTION === 'production'
-
         res.cookie('token', token, {
             path: '/',
             httpOnly: true,
@@ -133,10 +131,6 @@ export class UserController {
             complement,
             name
         } = body.data
-
-        if (!cpfValidator(cpf)) {
-            throw new BadRequestException('CPF inválido')
-        }
 
         await this.userService.createAddress(
             { userId },

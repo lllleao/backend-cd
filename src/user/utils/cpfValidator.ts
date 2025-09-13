@@ -1,4 +1,4 @@
-const cpfValidator = (cpf: string) => {
+const cpfValidator = (cpf: string): boolean => {
     cpf = cpf.replace(/\D/g, '')
 
     if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {

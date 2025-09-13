@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common'
 import { CrsfGuard } from '../auth/auth.crsf.guard'
 import { JwtGuard } from '../auth/auth.jwt.guard'
-import { ItemCartDTP, UpdataPriceDTO } from './cart.dto'
+import { ItemCartDTP, PurchaseDataDTO, UpdataPriceDTO } from './cart.dto'
 import { CartService } from './cart.service'
 import { Request } from 'express'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
@@ -61,6 +61,7 @@ export class CartController {
     ) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const userId = req['user'].userId as number
+
         return await this.cartService.delete(id, userId)
     }
 
@@ -91,7 +92,7 @@ export class CartController {
 
     @Post('create-purchase')
     @UseGuards(CrsfGuard, JwtGuard)
-    postCreatePurchse(@Req() req: Request, @Body() body: UpdataPriceDTO) {
+    postCreatePurchse(@Req() req: Request, @Body() body: PurchaseDataDTO) {
         // const userId = req['user'].userId as number
 
         console.log(body)
