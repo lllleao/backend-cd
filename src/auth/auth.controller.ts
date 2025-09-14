@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import {
     BadRequestException,
     Controller,
@@ -20,7 +19,7 @@ export class AuthController {
     constructor(private authService: AuthService) {}
 
     @Post('get-csrfToken')
-    @Throttle({ csrfToken: { ttl: 60000, limit: 50 } })
+    // @Throttle({ csrfToken: { ttl: 60000, limit: 50 } })
     getCSRFToken(@Res() res: Response) {
         const token = this.authService.generateCsrfToken()
         return res.status(200).json({ token })
@@ -35,7 +34,7 @@ export class AuthController {
 
     @Post('verify-csrfToken')
     @UseGuards(CrsfGuard)
-    @Throttle({ csrfToken: { ttl: 60000, limit: 60 } })
+    // @Throttle({ csrfToken: { ttl: 60000, limit: 60 } })
     getVerifyCsrfToken() {
         return { success: true }
     }

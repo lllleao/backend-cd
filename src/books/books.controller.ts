@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common'
 import { BooksService } from './books.service'
 import { Books, BookSpecific } from '../common/types'

@@ -1,18 +1,17 @@
-import { Transform, Type } from 'class-transformer'
+import { Type } from 'class-transformer'
 import {
     IsNotEmpty,
     IsNumber,
-    IsOptional,
     IsString,
-    Length,
     Matches,
     Min,
     IsInt,
-    IsBoolean
+    Max,
+    ArrayNotEmpty,
+    IsArray,
+    ValidateNested
 } from 'class-validator'
 import { Trim } from '../common/utils/trim.utils'
-import { Escape } from 'class-sanitizer'
-import { isValidCPF } from 'src/user/utils/isValidCPF'
 
 export class ItemCartDTP {
     @IsString({ message: 'A senha deve ser uma string' })
@@ -27,65 +26,63 @@ export class ItemCartDTP {
     @Type(() => Number)
     @IsNotEmpty({ message: 'Campo obrigatório' })
     @Min(1)
+    @Max(3)
     @IsInt()
     quant: number
 
     @IsString({ message: 'A senha deve ser uma string' })
     @IsNotEmpty({ message: 'Campo obrigatório' })
     name: string
+
+    @IsNumber()
+    @IsNotEmpty({ message: 'Campo obrigatório' })
+    @Min(1, { message: 'ID do produto inválido' })
+    id: number
 }
 
 export class UpdataPriceDTO {
     @IsNumber()
     @IsNotEmpty({ message: 'Campo obrigatório' })
-    quantBefore: number
-
-    @IsNumber()
-    @IsNotEmpty({ message: 'Campo obrigatório' })
+    @IsInt()
+    @Min(1)
+    @Max(3)
     quantCurrent: number
 
     @IsNumber()
     @IsNotEmpty({ message: 'Campo obrigatório' })
+    @Min(1)
+    @IsInt()
     idItem: number
-
-    @IsNumber()
-    @IsNotEmpty({ message: 'Campo obrigatório' })
-    price: number
 }
 
-class ItemsInfo {
-    @IsNotEmpty()
-    @IsNumber()
+export class ItemsInfoDTO {
     @IsNotEmpty({ message: 'Campo obrigatório' })
-    @Matches(/^(?!\s*$).+/, { message: 'O campo não pode ser só espaços' })
+    @IsNumber()
+    @Min(1)
     price: number
 
-    @IsNotEmpty()
-    @IsNumber()
     @IsNotEmpty({ message: 'Campo obrigatório' })
-    @Matches(/^(?!\s*$).+/, { message: 'O campo não pode ser só espaços' })
+    @IsNumber()
+    @Min(1)
+    @Max(3)
     quant: number
 
-    @IsNotEmpty()
     @IsNumber()
+    @IsInt()
     @IsNotEmpty({ message: 'Campo obrigatório' })
-    @Matches(/^(?!\s*$).+/, { message: 'O campo não pode ser só espaços' })
+    @Min(1, { message: 'ID do produto inválido' })
     id: number
+
+    @IsNumber()
+    @IsInt()
+    @IsNotEmpty({ message: 'Campo obrigatório' })
+    @Min(1, { message: 'ID do produto inválido' })
+    productId: number
 
     @Trim()
     @IsNotEmpty({ message: 'Obrigatório' })
     @IsString({ message: 'O nome deve ser uma string' })
-    @Escape()
-    @Matches(/^[A-Za-zÀ-ÿ\s]+$/, {
-        message: 'O nome deve conter apenas letras'
-    })
     @Matches(/^(?!\s*$).+/, { message: 'O campo não pode ser só espaços' })
-    @Transform(({ value }: { value: string }) =>
-        value
-            .trim()
-            .toLowerCase()
-            .replace(/(^\p{L}|\s\p{L})/gu, (char: string) => char.toUpperCase())
-    )
     name: string
 
     @IsString()
@@ -95,96 +92,14 @@ class ItemsInfo {
 }
 
 export class PurchaseDataDTO {
-    @Trim()
-    @IsNotEmpty({ message: 'Obrigatório' })
-    @IsString({ message: 'O nome deve ser uma string' })
-    @Escape()
-    @Matches(/^[A-Za-zÀ-ÿ\s]+$/, {
-        message: 'O nome deve conter apenas letras'
-    })
-    @Matches(/^(?!\s*$).+/, { message: 'O campo não pode ser só espaços' })
-    @Transform(({ value }: { value: string }) =>
-        value
-            .trim()
-            .toLowerCase()
-            .replace(/(^\p{L}|\s\p{L})/gu, (char: string) => char.toUpperCase())
-    )
-    name: string
-
-    @Trim()
-    @IsString()
     @IsNotEmpty()
-    @Escape()
-    @Matches(/^\d{11}$/, {
-        message: 'CPF deve conter exatamente 11 dígitos numéricos'
-    })
-    @Matches(/^(?!\s*$).+/, { message: 'O campo não pode ser só espaços' })
-    @isValidCPF({ message: 'CPF inválido' })
-    cpf: string
+    @IsInt()
+    @Min(1)
+    addressId: number
 
-    @Trim()
-    @IsString()
-    @IsNotEmpty()
-    @Length(1, 6)
-    @Escape()
-    @Matches(/^(?!\s*$).+/, { message: 'O campo não pode ser só espaços' })
-    number: string
-
-    @Trim()
-    @IsString()
-    @IsNotEmpty()
-    @Escape()
-    @Matches(/^\d{8}$/, {
-        message: 'CEP deve conter exatamente 8 dígitos numéricos'
-    })
-    @Matches(/^(?!\s*$).+/, { message: 'O campo não pode ser só espaços' })
-    zipCode: string
-
-    @Trim()
-    @IsString()
-    @IsNotEmpty()
-    @Length(1, 40)
-    @Escape()
-    @Matches(/^(?!\s*$).+/, { message: 'O campo não pode ser só espaços' })
-    @Transform(({ value }: { value: string }) =>
-        value
-            .trim()
-            .toLowerCase()
-            .replace(/(^\p{L}|\s\p{L})/gu, (char: string) => char.toUpperCase())
-    )
-    street: string
-
-    @IsOptional()
-    @Trim()
-    @IsString()
-    @Length(0, 40)
-    @Trim()
-    @Escape()
-    complement?: string
-
-    @Trim()
-    @IsString()
-    @IsNotEmpty()
-    @Length(1, 40)
-    @Escape()
-    @Matches(/^(?!\s*$).+/, { message: 'O campo não pode ser só espaços' })
-    @Transform(({ value }: { value: string }) =>
-        value
-            .trim()
-            .toLowerCase()
-            .replace(/(^\p{L}|\s\p{L})/gu, (char: string) => char.toUpperCase())
-    )
-    neighborhood: string
-
-    @IsNumber()
-    @IsNotEmpty({ message: 'Campo obrigatório' })
-    totalPrice: number
-
-    @IsBoolean()
-    @Escape()
-    @IsNotEmpty()
-    isDefault: boolean
-
-    @IsNotEmpty()
-    itemsInfo: ItemsInfo[]
+    @IsArray()
+    @ArrayNotEmpty({ message: 'É necessário enviar pelo menos 1 item' })
+    @ValidateNested({ each: true })
+    @Type(() => ItemsInfoDTO)
+    itemsInfo: ItemsInfoDTO[]
 }

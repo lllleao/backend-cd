@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
     BadRequestException,
     Body,
@@ -103,7 +103,6 @@ export class UserController {
     @Throttle({ default: { ttl: 60000, limit: 100 } })
     async getProfileData(@Req() req: Request) {
         const profileData = await this.userService.profileData(
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             req['user'].userId as number
         )
         return profileData
@@ -126,7 +125,6 @@ export class UserController {
         @Req() req: Request,
         @Body() body: CreateAddressDto
     ) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const userId = req['user'].userId as number
         const {
             cpf,
@@ -160,9 +158,8 @@ export class UserController {
 
     @Get('get-address')
     @UseGuards(CrsfGuard, JwtGuard)
-    @Throttle({ default: { ttl: 60000, limit: 100 } })
+    @Throttle({ default: { ttl: 60000, limit: 200 } })
     async getAddress(@Req() req: Request) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const userId = req['user'].userId as number
         return await this.userService.addressUser(userId)
     }

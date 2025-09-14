@@ -56,7 +56,6 @@ export class UserService {
 
             await this.prismaService.cart.create({
                 data: {
-                    totalPrice: 0,
                     userId: user.id,
                     emailUser: user.email
                 }
@@ -115,7 +114,7 @@ export class UserService {
             })
         }
 
-        const token = await generateJWTToken('30s', user?.email, user?.id)
+        const token = await generateJWTToken('30m', user?.email, user?.id)
         const refreshToken = await generateRefreshJWTToken(
             '30m',
             user?.email,

@@ -1,5 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
+import { ItemsInfoDTO } from './cart.dto'
+import cpfValidator from 'src/user/utils/cpfValidator'
 
 @Injectable()
 export class CartService {
@@ -9,7 +11,8 @@ export class CartService {
         name: string,
         photo: string,
         price: number,
-        quant: number
+        quant: number,
+        productId: number
     ) {
         const cart = await this.prismaService.cart.findUnique({
             where: {
@@ -32,25 +35,8 @@ export class CartService {
                 name,
                 photo,
                 price,
-                quant
-            }
-        })
-
-        const calcTotalPrice = await this.prismaService.item.aggregate({
-            _sum: {
-                price: true
-            },
-            where: {
-                userId
-            }
-        })
-
-        await this.prismaService.cart.update({
-            where: {
-                userId
-            },
-            data: {
-                totalPrice: calcTotalPrice._sum.price || 0
+                quant,
+                productId
             }
         })
 
@@ -66,75 +52,99 @@ export class CartService {
         return items
     }
 
-    async delete(id: number, userId: number) {
+    async delete(id: number) {
         const item = await this.prismaService.item.delete({
             where: {
                 id: id
             }
         })
 
-        const cart = await this.prismaService.cart.findUnique({
-            where: {
-                userId
-            }
-        })
-
-        await this.prismaService.cart.update({
-            where: {
-                userId
-            },
-            data: {
-                totalPrice: Number(cart?.totalPrice) - item.price
-            }
-        })
         return item
     }
 
-    async totalPrice(userId: number) {
-        const cart = await this.prismaService.cart.findUnique({
+    async patchQuant(userId: number, newQuant: number, idItem: number) {
+        const user = await this.prismaService.user_cd.findUnique({
             where: {
-                userId
+                id: userId
             }
         })
 
-        return { totalPrice: cart?.totalPrice }
-    }
+        if (!user) {
+            throw new BadRequestException('Usuário não existe.')
+        }
 
-    async patchTotalPrice(
-        userId: number,
-        quantCurrent: number,
-        quantBefore: number,
-        idItem: number,
-        price: number
-    ) {
         await this.prismaService.item.update({
             where: {
                 id: idItem
             },
             data: {
-                quant: quantCurrent,
-                price: (price / quantBefore) * quantCurrent
-            }
-        })
-
-        const calcTotalPrice = await this.prismaService.item.aggregate({
-            _sum: {
-                price: true
-            },
-            where: {
-                userId
-            }
-        })
-
-        await this.prismaService.cart.update({
-            where: {
-                userId
-            },
-            data: {
-                totalPrice: calcTotalPrice._sum.price || 0
+                quant: newQuant
             }
         })
 
         return { priceupdated: true }
+    }
+
+    async createPurchse(
+        userId: number,
+        items: ItemsInfoDTO[],
+        addressId: number
+    ) {
+        const productsId = items.map((item) => item.productId)
+        const products = await this.prismaService.store_book.findMany({
+            where: {
+                id: { in: productsId }
+            }
+        })
+
+        if (products.length !== items.length) {
+            throw new BadRequestException(
+                'Um ou mais produtos não existem ou estão inativos'
+            )
+        }
+
+        const totalPrice = items.reduce((acum, currentItem) => {
+            return acum + currentItem.price * currentItem.quant
+        }, 0)
+
+        if (totalPrice <= 1) {
+            throw new BadRequestException('Valor total inválido')
+        }
+
+        const addressPurchase = await this.prismaService.address.findUnique({
+            where: {
+                id: addressId
+            }
+        })
+
+        if (!cpfValidator(addressPurchase?.cpf as string)) {
+            throw new BadRequestException('CPF inválido')
+        }
+        await this.prismaService.$transaction(async (tx) => {
+            const newPurchase = await tx.purchase.create({
+                data: {
+                    buyerAddress: `${addressPurchase?.zipCode}-${addressPurchase?.neighborhood}-${addressPurchase?.street}-${addressPurchase?.number}`,
+                    buyerAddressId: addressId,
+                    buyerCPF: addressPurchase?.cpf as string,
+                    buyerName: addressPurchase?.name as string,
+                    totalPrice,
+                    userId
+                }
+            })
+
+            await tx.purchaseItem.createMany({
+                data: items.map(({ name, photo, price, quant }) => {
+                    return {
+                        name,
+                        quant,
+                        price,
+                        photo,
+                        purchaseId: newPurchase.id
+                    }
+                })
+            })
+        })
+
+        return { message: 'Compra criada com sucesso' }
     }
 }

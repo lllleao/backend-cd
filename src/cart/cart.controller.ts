@@ -1,10 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
+    BadRequestException,
     Body,
     ConflictException,
     Controller,
     Delete,
     Get,
+    InternalServerErrorException,
+    NotFoundException,
     Param,
     ParseIntPipe,
     Patch,
@@ -28,7 +31,6 @@ export class CartController {
     @UseGuards(CrsfGuard, JwtGuard)
     @Throttle({ login: { ttl: 60000, limit: 30 } })
     async addToCart(@Req() req: Request, @Body() body: ItemCartDTP) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const userId = req['user'].userId as number
         try {
             return await this.cartService.addToCart(
@@ -36,7 +38,8 @@ export class CartController {
                 body.name,
                 body.photo,
                 body.price,
-                body.quant
+                body.quant,
+                body.id
             )
         } catch (err) {
             if (err instanceof PrismaClientKnownRequestError) {
@@ -51,7 +54,6 @@ export class CartController {
     @UseGuards(CrsfGuard, JwtGuard)
     @Throttle({ login: { ttl: 60000, limit: 100 } })
     async getItemsCart(@Req() req: Request) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const userId = req['user'].userId as number
         const items = await this.cartService.itemsCart(userId)
         return { items }
@@ -64,45 +66,43 @@ export class CartController {
         @Req() req: Request,
         @Param('id', ParseIntPipe) id: number
     ) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const userId = req['user'].userId as number
-
-        return await this.cartService.delete(id, userId)
-    }
-
-    @Get('total-price')
-    @UseGuards(CrsfGuard, JwtGuard)
-    @Throttle({ default: { ttl: 60000, limit: 100 } })
-    async getTotalPrice(@Req() req: Request) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const userId = req['user'].userId as number
-
-        return await this.cartService.totalPrice(userId)
+        return await this.cartService.delete(id)
     }
 
     @Patch('update-price')
     @UseGuards(CrsfGuard, JwtGuard)
-    @Throttle({ login: { ttl: 60000, limit: 30 } })
+    @Throttle({ login: { ttl: 60000, limit: 100 } })
     async patchTotalPrice(@Req() req: Request, @Body() body: UpdataPriceDTO) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const userId = req['user'].userId as number
-        const { quantCurrent, quantBefore, idItem, price } = body
+        const { quantCurrent, idItem } = body
 
-        return await this.cartService.patchTotalPrice(
-            userId,
-            quantCurrent,
-            quantBefore,
-            idItem,
-            price
-        )
+        return await this.cartService.patchQuant(userId, quantCurrent, idItem)
     }
 
     @Post('create-purchase')
     @UseGuards(CrsfGuard, JwtGuard)
-    @Throttle({ login: { ttl: 60000, limit: 3 } })
-    postCreatePurchse(@Req() req: Request, @Body() body: PurchaseDataDTO) {
-        // const userId = req['user'].userId as number
+    // @Throttle({ login: { ttl: 60000, limit: 3 } })
+    async postCreatePurchse(
+        @Req() req: Request,
+        @Body() body: PurchaseDataDTO
+    ) {
+        const userId = req['user'].userId as number
 
-        console.log(body)
+        try {
+            return await this.cartService.createPurchse(
+                userId,
+                body.itemsInfo,
+                body.addressId
+            )
+        } catch (err) {
+            if (err instanceof NotFoundException) throw err
+            if (err instanceof BadRequestException) throw err
+            if (err instanceof ConflictException) throw err
+
+            // fallback p/ erros não tratados
+            throw new InternalServerErrorException(
+                'Erro inesperado ao criar compra'
+            )
+        }
     }
 }
