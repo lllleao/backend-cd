@@ -30,7 +30,6 @@ export class BooksController {
     async getAllStoreBooks() {
         return await this.booksService.findAllStoreBooks()
     }
-
     @Get('store/:id')
     @Throttle({ csrfToken: { ttl: 60000, limit: 100 } })
     async getSpecificStoreBook(

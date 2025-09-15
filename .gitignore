@@ -19,7 +19,7 @@ yarn-error.log*
 # Prisma
 /prisma/migrations/
 /prisma/dev.db
-
+homologacao-659729-nestjs_cert.pem
 # Editor directories and files
 .vscode/
 .idea/
