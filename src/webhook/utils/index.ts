@@ -8,6 +8,6 @@ export const getUrlWithHMAC = () => {
         .createHmac('sha256', secret as string)
         .update(baseUrl)
         .digest('hex')
-    const webhookUrl = `${baseUrl}?hmac=${hmac}&ignorar=`
+    const webhookUrl = `${baseUrl}/webhook?hmac=${hmac}&ignorar=`
     return webhookUrl
 }

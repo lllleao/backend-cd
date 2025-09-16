@@ -25,5 +25,5 @@ export const getCredentialsApiPix = () => {
         passphrase: ''
     })
 
-    return { grantType, auth, agent }
+    return { grantType, auth, agent, certificado }
 }

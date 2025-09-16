@@ -4,8 +4,7 @@ import { firstValueFrom } from 'rxjs'
 import { HttpService } from '@nestjs/axios'
 import { AxiosRequestConfig } from 'axios'
 import { ApiPixService } from '../apiPix/apiPix.service'
-import * as fs from 'fs'
-import * as https from 'https'
+import { getCredentialsApiPix } from '../apiPix/utils/credentialsApiPix'
 
 @Injectable()
 export class WebHookApiPixService {
@@ -14,12 +13,8 @@ export class WebHookApiPixService {
         private apiPixService: ApiPixService
     ) {}
     async configUlr() {
-        const agent = new https.Agent({
-            cert: fs.readFileSync(process.env.CERTIFICADO_SSL as string),
-            key: fs.readFileSync(process.env.PRIVATE_KEY as string),
-            ca: fs.readFileSync(process.env.CERTIFICADO_PUBLICO as string),
-            rejectUnauthorized: true
-        })
+        const { agent } = getCredentialsApiPix()
+
         const tokenData = await this.apiPixService.getOAuthTokenPix()
 
         const url = process.env.URL_EFI_API_DEV as string
@@ -28,13 +23,9 @@ export class WebHookApiPixService {
         const config: AxiosRequestConfig = {
             headers: {
                 Authorization: 'Bearer ' + tokenData.data.access_token,
-                'Content-Type': 'application/json',
-                'x-skip-mtls-checking': 'false'
+                'Content-Type': 'application/json'
             },
-            httpsAgent: agent,
-            params: {
-                chave: 'e6ab7dd0-5cd9-4370-939c-5f258bdad648'
-            }
+            httpsAgent: agent
         }
 
         const body = {
@@ -42,7 +33,11 @@ export class WebHookApiPixService {
         }
 
         const response = await firstValueFrom(
-            this.httpService.patch(`${url}/v2/webhook/${urlHost}`, body, config)
+            this.httpService.put(
+                `${url}/v2/webhook/e6ab7dd0-5cd9-4370-939c-5f258bdad648`,
+                body,
+                config
+            )
         )
 
         console.log(response)
