@@ -53,7 +53,6 @@ async function bootstrap() {
             transform: true // transforma os objetos automaticamente em instâncias de classes
         })
     )
-
     await app.listen(process.env.PORT ?? 3000, '0.0.0.0')
 }
 bootstrap()

@@ -13,6 +13,8 @@ import { CartModule } from './cart/cart.module'
 import { APP_FILTER, APP_GUARD } from '@nestjs/core'
 import { UserThrottlerGuard } from './Throttler/user.throttler.guard'
 import { ThrottlerExceptionFilter } from './Throttler/throttler-exception.filter'
+import { ApiPixModule } from './apiPix/apiPix.module'
+import { WebHookApiPixModule } from './webhook/webhook.module'
 
 @Module({
     imports: [
@@ -22,10 +24,10 @@ import { ThrottlerExceptionFilter } from './Throttler/throttler-exception.filter
             isGlobal: true
         }),
         AuthModule,
+        WebHookApiPixModule,
         EmailModule,
         UserModel,
         CartModule,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         ThrottlerModule.forRoot({
             throttlers: [
                 {
@@ -44,7 +46,8 @@ import { ThrottlerExceptionFilter } from './Throttler/throttler-exception.filter
                     limit: 50
                 }
             ]
-        })
+        }),
+        ApiPixModule
     ],
     controllers: [AppController, CatsController],
 
