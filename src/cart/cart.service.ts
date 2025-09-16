@@ -120,7 +120,7 @@ export class CartService {
         if (!cpfValidator(addressPurchase?.cpf as string)) {
             throw new BadRequestException('CPF inválido')
         }
-        await this.prismaService.$transaction(async (tx) => {
+        const response = await this.prismaService.$transaction(async (tx) => {
             const newPurchase = await tx.purchase.create({
                 data: {
                     buyerAddress: `${addressPurchase?.zipCode}-${addressPurchase?.neighborhood}-${addressPurchase?.street}-${addressPurchase?.number}`,
@@ -143,8 +143,10 @@ export class CartService {
                     }
                 })
             })
+
+            return newPurchase
         })
 
-        return { message: 'Compra criada com sucesso' }
+        return { message: 'Compra criada com sucesso', purchaseId: response.id }
     }
 }
