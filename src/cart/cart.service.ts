@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
 import { ItemsInfoDTO } from './cart.dto'
-import cpfValidator from 'src/user/utils/cpfValidator'
+import cpfValidator from '../user/utils/cpfValidator'
 
 @Injectable()
 export class CartService {

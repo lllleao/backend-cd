@@ -3,7 +3,7 @@ import { getUrlWithHMAC } from './utils'
 import { firstValueFrom } from 'rxjs'
 import { HttpService } from '@nestjs/axios'
 import { AxiosRequestConfig } from 'axios'
-import { ApiPixService } from 'src/apiPix/apiPix.service'
+import { ApiPixService } from '../apiPix/apiPix.service'
 import * as fs from 'fs'
 import * as https from 'https'
 

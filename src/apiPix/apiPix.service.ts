@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs'
 import { ApiPixTokenOAuthType, QrCodePixType } from './apiPix.types'
 import { CACHE_MANAGER } from '@nestjs/cache-manager'
 import { Cache } from 'cache-manager'
-import { PrismaService } from 'src/prisma/prisma.service'
+import { PrismaService } from '../prisma/prisma.service'
 import { getCredentialsApiPix } from './utils/credentialsApiPix'
 import { AxiosRequestConfig } from 'axios'
 
