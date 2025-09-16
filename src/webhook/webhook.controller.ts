@@ -12,6 +12,7 @@ export class WebHookApiPixController {
 
     @Post()
     handleWebHookConfig(@Req() req: Request, @Res() res: Response) {
+        console.log('chegou na rota webHook')
         const socket = res.socket as TLSSocket
         if (socket.authorized) {
             res.status(200).end()
