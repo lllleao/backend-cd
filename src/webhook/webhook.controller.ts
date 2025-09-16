@@ -13,8 +13,10 @@ export class WebHookApiPixController {
     @Post()
     handleWebHookConfig(@Req() req: Request, @Res() res: Response) {
         console.log('chegou na rota webHook')
-        const socket = res.socket as TLSSocket
-        if (socket.authorized) {
+        const clientVerify = req.headers['ssl_client_verify']
+        console.log('clientVerify: ', clientVerify)
+        // const socket = res.socket as TLSSocket
+        if (clientVerify === 'SUCCESS') {
             res.status(200).end()
         } else {
             res.status(401).end()

@@ -2,7 +2,7 @@ import * as crypto from 'crypto'
 
 export const getUrlWithHMAC = () => {
     const secret = process.env.URL_HMAC_EFI_API
-    const baseUrl = 'https://cidadeclipsebackend.com.br' as string
+    const baseUrl = 'https://www.cidadeclipsebackend.com.br' as string
 
     const hmac = crypto
         .createHmac('sha256', secret as string)
