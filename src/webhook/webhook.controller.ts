@@ -2,6 +2,7 @@
 import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { WebHookApiPixService } from './webhoos.service'
+import { TLSSocket } from 'tls'
 
 @Controller('webhook')
 export class WebHookApiPixController {
@@ -10,10 +11,10 @@ export class WebHookApiPixController {
     @Post()
     handleWebHookConfig(@Req() req: Request, @Res() res: Response) {
         console.log('chegou na rota webHook')
-        const clientVerify = req.headers['ssl_client_verify']
-        console.log('clientVerify: ', clientVerify)
-        // const socket = res.socket as TLSSocket
-        if (clientVerify === 'SUCCESS') {
+        // const clientVerify = req.headers['ssl_client_verify']
+        const socket = req.socket as TLSSocket
+        console.log('clientVerify: ', socket)
+        if (socket.authorized) {
             res.status(200).end()
         } else {
             res.status(401).end()
