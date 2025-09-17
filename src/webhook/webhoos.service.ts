@@ -23,7 +23,7 @@ export class WebHookApiPixService {
         const config: AxiosRequestConfig = {
             headers: {
                 Authorization: 'Bearer ' + tokenData.data.access_token,
-                'Content-Type': 'application/json'
+                'x-skip-mtls-checking': true
             },
             httpsAgent: agent
         }

@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common'
+import { Controller, Get, Post, Req, Res } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { WebHookApiPixService } from './webhoos.service'
 import { TLSSocket } from 'tls'
@@ -12,15 +11,15 @@ export class WebHookApiPixController {
     handleWebHookConfig(@Req() req: Request, @Res() res: Response) {
         console.log('chegou na rota webHook')
         // const clientVerify = req.headers['ssl_client_verify']
+
         const socket = req.socket as TLSSocket
-        console.log('clientVerify: ', socket)
+        console.log('clientVerify: ', req)
         if (socket.authorized) {
             res.status(200).end()
         } else {
             res.status(401).end()
         }
     }
-
     @Post('pix')
     handleWebhookPix(@Req() req: Request, @Res() res: Response) {
         console.log('chegou na rota pix')
