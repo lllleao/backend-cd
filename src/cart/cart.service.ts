@@ -197,4 +197,23 @@ export class CartService {
 
         return { message: 'Compra realizada com sucesso' }
     }
+
+    async deleteAllItems(userId: number) {
+        await this.prismaService.item.deleteMany({
+            where: {
+                userId
+            }
+        })
+    }
+    async purchasePaid(userId: number) {
+        return await this.prismaService.purchase.findMany({
+            where: {
+                userId,
+                status: 'PAID'
+            },
+            include: {
+                items: true
+            }
+        })
+    }
 }

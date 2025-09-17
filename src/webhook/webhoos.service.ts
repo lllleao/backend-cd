@@ -8,6 +8,7 @@ import { ApiPixService } from '../apiPix/apiPix.service'
 import { getCredentialsApiPix } from '../apiPix/utils/credentialsApiPix'
 import { PrismaService } from '../prisma/prisma.service'
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager'
+import { EmailService } from '../emial/email.service'
 
 @Injectable()
 export class WebHookApiPixService {
@@ -15,6 +16,7 @@ export class WebHookApiPixService {
         private readonly httpService: HttpService,
         private apiPixService: ApiPixService,
         private prismaService: PrismaService,
+        private emailService: EmailService,
         @Inject(CACHE_MANAGER) private cacheManager: Cache
     ) {}
     async configUlr() {
@@ -36,14 +38,13 @@ export class WebHookApiPixService {
             webhookUrl: urlHost
         }
 
-        const response = await firstValueFrom(
+        await firstValueFrom(
             this.httpService.put(
                 `${url}/v2/webhook/e6ab7dd0-5cd9-4370-939c-5f258bdad648`,
                 body,
                 config
             )
         )
-        console.log(response)
     }
 
     async checkPayment(txid: string) {
@@ -72,9 +73,7 @@ export class WebHookApiPixService {
         )
 
         const purchaseId = response.data.solicitacaoPagador as string
-        const cob = response.data.solicitacaoPagador as string
-        console.log('AQUI É A COB', cob)
-        return await this.prismaService.purchase.update({
+        const purchaseUpdated = await this.prismaService.purchase.update({
             where: {
                 id: Number(purchaseId)
             },
@@ -82,5 +81,21 @@ export class WebHookApiPixService {
                 status: 'PAID'
             }
         })
+
+        const emailUser = await this.prismaService.user_cd.findUnique({
+            where: {
+                id: purchaseUpdated.userId
+            }
+        })
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: process.env.EMAIL_USER,
+            replyTo: emailUser?.email,
+            subject: 'Compra realizada',
+            html: `<h1>Sua compra no valor de R$ ${purchaseUpdated.totalPrice} foi realizada com sucesso, as informações sobre o status da entrega estão no nosso site.</h1></br>`
+        }
+
+        await this.emailService.sendEmail(mailOptions)
     }
 }

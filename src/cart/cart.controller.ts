@@ -62,11 +62,27 @@ export class CartController {
     @Delete('delete/:id')
     @UseGuards(CrsfGuard, JwtGuard)
     @Throttle({ login: { ttl: 60000, limit: 30 } })
-    async deleteItemCart(
-        @Req() req: Request,
-        @Param('id', ParseIntPipe) id: number
-    ) {
+    async deleteItemCart(@Param('id', ParseIntPipe) id: number) {
         return await this.cartService.delete(id)
+    }
+
+    @Delete('delete-all')
+    @UseGuards(CrsfGuard, JwtGuard)
+    @Throttle({ login: { ttl: 60000, limit: 30 } })
+    async deleteAllItemCart(@Req() req: Request) {
+        const userId = req['user'].userId as number
+
+        try {
+            await this.cartService.deleteAllItems(userId)
+            return { success: true }
+        } catch (err) {
+            console.log(err)
+            throw new BadRequestException({
+                message: 'Itens não foram deletados',
+                error: 'Itens não foram deletados',
+                statusCode: 400
+            })
+        }
     }
 
     @Patch('update-price')
@@ -103,6 +119,24 @@ export class CartController {
             throw new InternalServerErrorException(
                 'Erro inesperado ao criar compra'
             )
+        }
+    }
+
+    @Get('purchase-paid')
+    @UseGuards(CrsfGuard, JwtGuard)
+    @Throttle({ login: { ttl: 60000, limit: 30 } })
+    async getPurchasePaid(@Req() req: Request) {
+        const userId = req['user'].userId as number
+
+        try {
+            return this.cartService.purchasePaid(userId)
+        } catch (err) {
+            console.log(err)
+            throw new BadRequestException({
+                message: 'Erro ao pegar items',
+                error: 'Erro ao pegar items',
+                statusCode: 400
+            })
         }
     }
 }

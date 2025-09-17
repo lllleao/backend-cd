@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Controller, Post, Req, Res } from '@nestjs/common'
+import {
+    Controller,
+    InternalServerErrorException,
+    Post,
+    Req,
+    Res
+} from '@nestjs/common'
 import { Request, Response } from 'express'
 import { WebHookApiPixService } from './webhoos.service'
 
@@ -10,17 +16,19 @@ export class WebHookApiPixController {
     @Post()
     async handleWebHookConfig(@Req() req: Request, @Res() res: Response) {
         console.log('chegou na rota webHook')
-        console.log(req.body)
 
         try {
-            const response = await this.webHookApiPixService.checkPayment(
+            await this.webHookApiPixService.checkPayment(
                 req.body.pix[0].txid as string
             )
-            console.log('Atualização', response)
             res.setHeader('Content-Type', 'text/plain')
             res.status(200).send('200')
         } catch (err) {
-            console.log(err)
+            throw new InternalServerErrorException({
+                message: 'Erro ao enviar e-mail.',
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                error: err.message || err
+            })
         }
     }
 }
