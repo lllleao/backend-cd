@@ -54,13 +54,8 @@ docker-compose.override.yml
 # public/
 
 # API PIX
-homologacao-659729-nestjs_cert.pem
-homologacao-659729-nestjs.p12
-cert.pem
 certificate-chain-homolog.crt
 certificate-chain-prod.crt
-homologacao-659729-nestj cidadeclipse.p12
-homologacao-659729-nestj cidadeclipse.pem
-privkey.pem
 producao-659729-Test_CD_cert.pem
 homologacao-659729-nestCd.p12
+producao-659729-Test_CD.p12
