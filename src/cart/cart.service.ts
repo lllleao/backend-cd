@@ -2,10 +2,14 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
 import { ItemsInfoDTO } from './cart.dto'
 import cpfValidator from '../user/utils/cpfValidator'
+import { ApiPixService } from '../apiPix/apiPix.service'
 
 @Injectable()
 export class CartService {
-    constructor(private prismaService: PrismaService) {}
+    constructor(
+        private prismaService: PrismaService,
+        private apiPixService: ApiPixService
+    ) {}
     async addToCart(
         userId: number,
         name: string,
@@ -85,11 +89,24 @@ export class CartService {
         return { priceupdated: true }
     }
 
+    async getPendingPurchase(userId: number) {
+        const pendingPurchase = await this.prismaService.purchase.findFirst({
+            where: {
+                userId,
+                status: 'PENDING'
+            }
+        })
+
+        return { pendingPurchase }
+    }
+
     async createPurchse(
         userId: number,
         items: ItemsInfoDTO[],
         addressId: number
     ) {
+        const { pendingPurchase } = await this.getPendingPurchase(userId)
+
         const productsId = items.map((item) => item.productId)
         const products = await this.prismaService.store_book.findMany({
             where: {
@@ -107,7 +124,7 @@ export class CartService {
             return acum + currentItem.price * currentItem.quant
         }, 0)
 
-        if (totalPrice <= 1) {
+        if (totalPrice <= 9) {
             throw new BadRequestException('Valor total inválido')
         }
 
@@ -120,10 +137,21 @@ export class CartService {
         if (!cpfValidator(addressPurchase?.cpf as string)) {
             throw new BadRequestException('CPF inválido')
         }
-        const response = await this.prismaService.$transaction(async (tx) => {
+
+        const addressUser = `${addressPurchase?.zipCode}-${addressPurchase?.neighborhood}-${addressPurchase?.street}-${addressPurchase?.number}`
+
+        if (pendingPurchase) {
+            await this.prismaService.purchase.delete({
+                where: {
+                    id: pendingPurchase.id
+                }
+            })
+        }
+
+        const purchase = await this.prismaService.$transaction(async (tx) => {
             const newPurchase = await tx.purchase.create({
                 data: {
-                    buyerAddress: `${addressPurchase?.zipCode}-${addressPurchase?.neighborhood}-${addressPurchase?.street}-${addressPurchase?.number}`,
+                    buyerAddress: addressUser,
                     buyerAddressId: addressId,
                     buyerCPF: addressPurchase?.cpf as string,
                     buyerName: addressPurchase?.name as string,
@@ -147,6 +175,26 @@ export class CartService {
             return newPurchase
         })
 
-        return { message: 'Compra criada com sucesso', purchaseId: response.id }
+        const infoPix = await this.apiPixService.generateQrCode({
+            buyerCPF: purchase.buyerCPF,
+            buyerName: purchase.buyerName,
+            totalPrice: purchase.totalPrice,
+            purchaseId: purchase.id
+        })
+
+        const expirationTime = new Date(Date.now() + 30 * 60 * 1000) // 30 minutos
+
+        await this.prismaService.purchase.update({
+            where: {
+                id: purchase.id
+            },
+            data: {
+                pixExpiration: expirationTime,
+                qrCodeBase64: infoPix.data.imagemQrcode,
+                copyPastePix: infoPix.data.qrcode
+            }
+        })
+
+        return { message: 'Compra realizada com sucesso' }
     }
 }

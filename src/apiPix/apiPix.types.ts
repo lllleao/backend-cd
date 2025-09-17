@@ -11,3 +11,10 @@ export type QrCodePixType = {
         imagemQrcode: string
     }
 }
+
+export type CobUserInfos = {
+    buyerCPF: string
+    buyerName: string
+    totalPrice: number
+    purchaseId: number
+}

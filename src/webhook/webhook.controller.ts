@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Req, Res } from '@nestjs/common'
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { Controller, Post, Req, Res } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { WebHookApiPixService } from './webhoos.service'
 
@@ -7,29 +8,19 @@ export class WebHookApiPixController {
     constructor(private webHookApiPixService: WebHookApiPixService) {}
 
     @Post()
-    handleWebHookConfig(@Req() req: Request, @Res() res: Response) {
+    async handleWebHookConfig(@Req() req: Request, @Res() res: Response) {
         console.log('chegou na rota webHook')
         console.log(req.body)
 
-        res.setHeader('Content-Type', 'text/plain')
-        res.status(200).send('200')
-    }
-
-    @Post('pix')
-    handleWebhookPix(@Req() req: Request, @Res() res: Response) {
-        console.log('chegou na rota pix')
-        const clientVerify = req.headers['ssl_client_verify']
-        console.log('clientVerify Pix: ', clientVerify)
-        // const socket = res.socket as TLSSocket
-        if (clientVerify === 'SUCCESS') {
-            res.status(200).end()
-        } else {
-            res.status(401).end()
+        try {
+            const response = await this.webHookApiPixService.checkPayment(
+                req.body.pix[0].txid as string
+            )
+            console.log('Atualização', response)
+            res.setHeader('Content-Type', 'text/plain')
+            res.status(200).send('200')
+        } catch (err) {
+            console.log(err)
         }
-    }
-
-    @Get('teste')
-    async configUrlApiPix() {
-        await this.webHookApiPixService.configUlr()
     }
 }

@@ -1,7 +1,11 @@
 import { HttpService } from '@nestjs/axios'
 import { Inject, Injectable } from '@nestjs/common'
 import { firstValueFrom } from 'rxjs'
-import { ApiPixTokenOAuthType, QrCodePixType } from './apiPix.types'
+import {
+    ApiPixTokenOAuthType,
+    CobUserInfos,
+    QrCodePixType
+} from './apiPix.types'
 import { CACHE_MANAGER } from '@nestjs/cache-manager'
 import { Cache } from 'cache-manager'
 import { PrismaService } from '../prisma/prisma.service'
@@ -43,31 +47,25 @@ export class ApiPixService {
     }
 
     async criarCobApiPix(
-        purchaseId: number,
-        tokenData: { access_token: string; expires_in: number }
+        tokenData: { access_token: string; expires_in: number },
+        userInfos: CobUserInfos
     ) {
         const { agent } = getCredentialsApiPix()
         const url = `${process.env.URL_EFI_API_DEV}/v2/cob/`
-
-        const purchaseData = await this.prismaService.purchase.findUnique({
-            where: {
-                id: purchaseId
-            }
-        })
 
         const data = {
             calendario: {
                 expiracao: 1800
             },
             devedor: {
-                cpf: String(purchaseData?.buyerCPF),
-                nome: purchaseData?.buyerName
+                cpf: String(userInfos.buyerCPF),
+                nome: userInfos.buyerName
             },
             valor: {
-                original: String(purchaseData?.totalPrice.toFixed(2))
+                original: String(userInfos.totalPrice.toFixed(2))
             },
             chave: 'e6ab7dd0-5cd9-4370-939c-5f258bdad648',
-            solicitacaoPagador: 'Cobrança de produtos.'
+            solicitacaoPagador: `${userInfos.purchaseId}`
         }
 
         const config: AxiosRequestConfig = {
@@ -84,22 +82,21 @@ export class ApiPixService {
         return response
     }
 
-    async generateQrCode(purchaseId: number) {
+    async generateQrCode(userInfos: CobUserInfos) {
         const { agent } = getCredentialsApiPix()
 
         let tokenData = await this.cacheManager.get<{
             access_token: string
             expires_in: number
         }>('oauthApiPix')
-
         if (!tokenData || Date.now() >= tokenData.expires_in) {
             tokenData = (await this.getOAuthTokenPix()).data
         }
+        const idLoc = await this.criarCobApiPix(tokenData, userInfos)
 
-        const idLoc = (await this.criarCobApiPix(purchaseId, tokenData)).data
-            .loc.id
-
-        const url = `${process.env.URL_EFI_API_DEV}/v2/loc/${idLoc}/qrcode/`
+        const url = `${process.env.URL_EFI_API_DEV}/v2/loc/${
+            idLoc.data.loc.id
+        }/qrcode/`
 
         const config: AxiosRequestConfig = {
             headers: {
@@ -112,9 +109,37 @@ export class ApiPixService {
         const response = (await firstValueFrom(
             this.httpService.get(url, config)
         )) as QrCodePixType
-
         return response
     }
 
-    webHookApiPix() {}
+    async getPendingPurchase(userId: number) {
+        const pendingPurchase = await this.prismaService.purchase.findFirst({
+            where: {
+                userId,
+                status: 'PENDING'
+            }
+        })
+
+        return {
+            buyerName: pendingPurchase?.buyerName,
+            buyerAddress: pendingPurchase?.buyerAddress,
+            totalPrice: pendingPurchase?.totalPrice,
+            qrCodeBase64: String(pendingPurchase?.qrCodeBase64),
+            copyPastePix: String(pendingPurchase?.copyPastePix),
+            status: pendingPurchase?.status
+        }
+    }
+
+    async getIsPaid(userId: number) {
+        const purchasePending = await this.prismaService.purchase.findFirst({
+            where: {
+                userId,
+                status: 'PENDING'
+            }
+        })
+
+        return {
+            status: purchasePending?.status
+        }
+    }
 }

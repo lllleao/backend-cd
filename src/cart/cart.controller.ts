@@ -99,7 +99,7 @@ export class CartController {
             if (err instanceof BadRequestException) throw err
             if (err instanceof ConflictException) throw err
 
-            // fallback p/ erros não tratados
+            console.log('Erro inesperado ao criar compra', err)
             throw new InternalServerErrorException(
                 'Erro inesperado ao criar compra'
             )

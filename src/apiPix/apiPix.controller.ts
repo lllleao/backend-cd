@@ -1,18 +1,30 @@
-import { Body, Controller, Post } from '@nestjs/common'
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { Body, Controller, Get, Req, UseGuards } from '@nestjs/common'
 import { ApiPixService } from './apiPix.service'
-import { CreateCobPix } from './apiPix.dto'
+import { CrsfGuard } from '../auth/auth.crsf.guard'
+import { JwtGuard } from '../auth/auth.jwt.guard'
 
 @Controller('api-pix')
 export class ApiPixController {
     constructor(private apiPixService: ApiPixService) {}
-    @Post('pay-pix')
-    async payWithPix(@Body() body: CreateCobPix) {
-        try {
-            const response = await this.apiPixService.generateQrCode(
-                body.purchaseId
-            )
 
-            console.log(response)
+    @UseGuards(CrsfGuard, JwtGuard)
+    @Get('pay-pix')
+    async payWithPix(@Req() req: Request) {
+        const userId = req['user'].userId as number
+        try {
+            return await this.apiPixService.getPendingPurchase(userId)
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    @UseGuards(CrsfGuard, JwtGuard)
+    @Get('is-paid')
+    async isPaid(@Req() req: Request) {
+        const userId = req['user'].userId as number
+        try {
+            return await this.apiPixService.getIsPaid(userId)
         } catch (err) {
             console.log(err)
         }

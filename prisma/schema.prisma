@@ -100,6 +100,13 @@ model item {
     @@unique([cartId, name], map: "cartId")
 }
 
+enum PurchaseStatus {
+    PENDING
+    PAID
+    EXPIRED
+    CANCELLED
+}
+
 model Purchase {
     id             Int      @id @default(autoincrement())
     userId         Int
@@ -109,6 +116,11 @@ model Purchase {
     buyerCPF       String   @db.VarChar(11)
     totalPrice     Float
     createdAt      DateTime @default(now())
+
+    status        PurchaseStatus @default(PENDING)
+    pixExpiration DateTime?
+    qrCodeBase64  String?        @db.Text
+    copyPastePix  String?        @db.Text
 
     items   PurchaseItem[]
     user_cd user_cd        @relation(fields: [userId], references: [id], onDelete: Cascade)
