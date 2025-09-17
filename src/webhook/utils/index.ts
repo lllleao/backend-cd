@@ -11,3 +11,9 @@ export const getUrlWithHMAC = () => {
     const webhookUrl = `${baseUrl}/webhook?hmac=${hmac}&ignorar=`
     return webhookUrl
 }
+
+export const formatDate = (dateIso: Date) => {
+    const data = new Date(dateIso)
+    const dateFormated = data.toLocaleString('pt-br', { timeZone: 'UTC' })
+    return dateFormated.slice(0, 10)
+}

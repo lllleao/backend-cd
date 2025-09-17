@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Inject, Injectable } from '@nestjs/common'
-import { getUrlWithHMAC } from './utils'
+import { formatDate, getUrlWithHMAC } from './utils'
 import { firstValueFrom } from 'rxjs'
 import { HttpService } from '@nestjs/axios'
 import { AxiosRequestConfig } from 'axios'
@@ -88,14 +88,29 @@ export class WebHookApiPixService {
             }
         })
 
-        const mailOptions = {
+        const mailOptionsClient = {
             from: process.env.EMAIL_USER,
-            to: process.env.EMAIL_USER,
-            replyTo: emailUser?.email,
+            to: emailUser?.email,
+            replyTo: process.env.EMAIL_USER,
             subject: 'Compra realizada',
             html: `<h1>Sua compra no valor de R$ ${purchaseUpdated.totalPrice} foi realizada com sucesso, as informações sobre o status da entrega estão no nosso site.</h1></br>`
         }
 
-        await this.emailService.sendEmail(mailOptions)
+        const mailOptionsCD = {
+            from: process.env.EMAIL_USER,
+            to: 'cidadeclipse@gmail.com',
+            replyTo: process.env.EMAIL_USER,
+            subject: 'Compra realizada',
+            html: `<h1>Compra realizada</h1>
+            <h3>Nome: ${purchaseUpdated.buyerName}</h3>
+            <h3>Endereço: ${purchaseUpdated.buyerAddress}</h3>
+            <h3>CPF: ${purchaseUpdated.buyerCPF}</h3>
+            <h3>Data da compra: ${formatDate(purchaseUpdated?.createdAt)}</h3>
+            <h3>Total: R$ ${purchaseUpdated.totalPrice}</h3>
+            `
+        }
+
+        await this.emailService.sendEmail(mailOptionsClient)
+        await this.emailService.sendEmail(mailOptionsCD)
     }
 }
