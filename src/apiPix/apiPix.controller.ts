@@ -8,7 +8,11 @@ export class ApiPixController {
     @Post('pay-pix')
     async payWithPix(@Body() body: CreateCobPix) {
         try {
-            await this.apiPixService.generateQrCode(body.purchaseId)
+            const response = await this.apiPixService.generateQrCode(
+                body.purchaseId
+            )
+
+            console.log(response)
         } catch (err) {
             console.log(err)
         }

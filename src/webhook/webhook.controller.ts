@@ -9,7 +9,7 @@ export class WebHookApiPixController {
     @Post()
     handleWebHookConfig(@Req() req: Request, @Res() res: Response) {
         console.log('chegou na rota webHook')
-        // const clientVerify = req.headers['ssl_client_verify']
+        console.log(req.body)
 
         res.setHeader('Content-Type', 'text/plain')
         res.status(200).send('200')
