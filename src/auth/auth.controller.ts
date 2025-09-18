@@ -12,36 +12,43 @@ import { JwtGuard } from './auth.jwt.guard'
 import { CrsfGuard } from './auth.crsf.guard'
 import { Request, Response } from 'express'
 import * as jwt from 'jsonwebtoken'
-import { Throttle } from '@nestjs/throttler'
+import { SkipThrottle, Throttle } from '@nestjs/throttler'
+import { filterSkipThrottler } from '../utils'
+import { UserThrottlerGuard } from '../Throttler/user.throttler.guard'
 
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) {}
 
+    @SkipThrottle(...filterSkipThrottler('getCsrfTokenLimit'))
+    @UseGuards(UserThrottlerGuard)
+    @Throttle({ getCsrfTokenLimit: { ttl: 60000, limit: 100 } })
     @Post('get-csrfToken')
-    // @Throttle({ csrfToken: { ttl: 60000, limit: 50 } })
     getCSRFToken(@Res() res: Response) {
         const token = this.authService.generateCsrfToken()
         return res.status(200).json({ token })
     }
 
+    @SkipThrottle(...filterSkipThrottler('getCookieLimit'))
+    @UseGuards(CrsfGuard, JwtGuard, UserThrottlerGuard)
+    @Throttle({ getCookieLimit: { ttl: 60000, limit: 200 } })
     @Get('get-cookie')
-    @UseGuards(CrsfGuard, JwtGuard)
-    @Throttle({ csrfToken: { ttl: 60000, limit: 50 } })
     getCookie() {
         return { success: true }
     }
 
+    @SkipThrottle(...filterSkipThrottler('verifyCsrfTokenLimit'))
+    @UseGuards(CrsfGuard, UserThrottlerGuard)
+    @Throttle({ verifyCsrfTokenLimit: { ttl: 60000, limit: 200 } })
     @Post('verify-csrfToken')
-    @UseGuards(CrsfGuard)
-    // @Throttle({ csrfToken: { ttl: 60000, limit: 60 } })
     getVerifyCsrfToken() {
         return { success: true }
     }
 
+    @SkipThrottle(...filterSkipThrottler('refreshLimit'))
+    @UseGuards(CrsfGuard, UserThrottlerGuard)
+    @Throttle({ refreshLimit: { ttl: 60000, limit: 5 } })
     @Post('refresh')
-    @UseGuards(CrsfGuard)
-    @Throttle({ csrfToken: { ttl: 60000, limit: 5 } })
     async postRefreshToken(@Req() req: Request, @Res() res: Response) {
         const refreshToken = req.cookies.refresh as string
 

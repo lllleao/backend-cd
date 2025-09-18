@@ -13,6 +13,7 @@ async function bootstrap() {
 
     const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',')
 
+    app.set('trust proxy', true)
     app.use(cookieParser())
     app.use(helmet())
     app.use(

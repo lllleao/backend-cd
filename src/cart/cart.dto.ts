@@ -14,23 +14,23 @@ import {
 import { Trim } from '../common/utils/trim.utils'
 
 export class ItemCartDTP {
-    @IsString({ message: 'A senha deve ser uma string' })
+    @IsString({ message: 'O campo deve ser uma string' })
     @IsNotEmpty({ message: 'Campo obrigatório' })
     photo: string
 
     @Type(() => Number)
     @IsNotEmpty({ message: 'Campo obrigatório' })
-    @Min(1)
+    @Min(10)
     price: number
 
     @Type(() => Number)
     @IsNotEmpty({ message: 'Campo obrigatório' })
     @Min(1)
-    @Max(3)
+    @Max(16)
     @IsInt()
     quant: number
 
-    @IsString({ message: 'A senha deve ser uma string' })
+    @IsString({ message: 'O campo deve ser uma string' })
     @IsNotEmpty({ message: 'Campo obrigatório' })
     name: string
 
@@ -38,6 +38,13 @@ export class ItemCartDTP {
     @IsNotEmpty({ message: 'Campo obrigatório' })
     @Min(1, { message: 'ID do produto inválido' })
     id: number
+
+    @Type(() => Number)
+    @IsNotEmpty({ message: 'Campo obrigatório' })
+    @Min(1)
+    @Max(16)
+    @IsInt()
+    stock: number
 }
 
 export class UpdataPriceDTO {
@@ -45,7 +52,7 @@ export class UpdataPriceDTO {
     @IsNotEmpty({ message: 'Campo obrigatório' })
     @IsInt()
     @Min(1)
-    @Max(3)
+    @Max(16)
     quantCurrent: number
 
     @IsNumber()
@@ -58,13 +65,13 @@ export class UpdataPriceDTO {
 export class ItemsInfoDTO {
     @IsNotEmpty({ message: 'Campo obrigatório' })
     @IsNumber()
-    @Min(1)
+    @Min(10)
     price: number
 
     @IsNotEmpty({ message: 'Campo obrigatório' })
     @IsNumber()
     @Min(1)
-    @Max(3)
+    @Max(16)
     quant: number
 
     @IsNumber()

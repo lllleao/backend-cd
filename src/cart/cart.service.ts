@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service'
 import { ItemsInfoDTO } from './cart.dto'
 import cpfValidator from '../user/utils/cpfValidator'
 import { ApiPixService } from '../apiPix/apiPix.service'
+import { calcFrete } from './utils'
 
 @Injectable()
 export class CartService {
@@ -16,7 +17,8 @@ export class CartService {
         photo: string,
         price: number,
         quant: number,
-        productId: number
+        productId: number,
+        stock: number
     ) {
         const cart = await this.prismaService.cart.findUnique({
             where: {
@@ -40,7 +42,8 @@ export class CartService {
                 photo,
                 price,
                 quant,
-                productId
+                productId,
+                stock
             }
         })
 
@@ -155,7 +158,7 @@ export class CartService {
                     buyerAddressId: addressId,
                     buyerCPF: addressPurchase?.cpf as string,
                     buyerName: addressPurchase?.name as string,
-                    totalPrice,
+                    totalPrice: calcFrete(totalPrice),
                     userId
                 }
             })

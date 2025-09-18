@@ -26,11 +26,12 @@ model store_book {
     title               String                @db.VarChar(255)
     descBook            String                @db.VarChar(100)
     photo               String                @db.VarChar(200)
-    summary             String                @db.Text
-    ibsn                String?               @db.VarChar(50)
-    pageQuant           String                @db.VarChar(30)
+    summary             String?               @db.Text
+    synopsis            String                @default("default") @db.Text
+    pageQuant           Int
     tags                String                @db.VarChar(255)
-    width               String                @db.VarChar(50)
+    author              String                @db.Text
+    stock               Int
     price               Decimal?              @db.Decimal(10, 2)
     store_books_credits store_books_credits[]
     item                item[]
@@ -39,8 +40,8 @@ model store_book {
 model store_books_credits {
     id            Int         @id @default(autoincrement())
     store_book_id Int?
-    type          String      @db.VarChar(100)
-    person        String      @db.VarChar(100)
+    type          String?     @db.VarChar(100)
+    person        String?     @db.VarChar(100)
     store_book    store_book? @relation(fields: [store_book_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "store_books_credits_ibfk_1")
 
     @@index([store_book_id], map: "store_book_id")
@@ -92,6 +93,7 @@ model item {
     photo     String @db.VarChar(255)
     price     Float  @db.Float
     quant     Int
+    stock     Int
 
     cart cart @relation(fields: [cartId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "item_ibfk_1")
 

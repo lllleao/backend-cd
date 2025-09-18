@@ -1,14 +1,25 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common'
+import {
+    Controller,
+    Get,
+    Param,
+    ParseIntPipe,
+    Query,
+    UseGuards
+} from '@nestjs/common'
 import { BooksService } from './books.service'
 import { Books, BookSpecific } from '../common/types'
-import { Throttle } from '@nestjs/throttler'
+import { SkipThrottle, Throttle } from '@nestjs/throttler'
+import { filterSkipThrottler } from '../utils'
+import { UserThrottlerGuard } from '../Throttler/user.throttler.guard'
 
 @Controller('books')
 export class BooksController {
     constructor(private booksService: BooksService) {}
 
+    @SkipThrottle(...filterSkipThrottler('publicBooks'))
+    @UseGuards(UserThrottlerGuard)
+    @Throttle({ publicBooks: { ttl: 60000, limit: 200 } })
     @Get('free')
-    @Throttle({ default: { ttl: 60000, limit: 200 } })
     async getFreeBooksPage(
         @Query('take', ParseIntPipe) take: number,
         @Query('skip', ParseIntPipe) skip: number
@@ -19,19 +30,26 @@ export class BooksController {
         )) as unknown as Books[]
     }
 
+    @SkipThrottle(...filterSkipThrottler('publicBooks'))
+    @UseGuards(UserThrottlerGuard)
+    @Throttle({ publicBooks: { ttl: 60000, limit: 200 } })
     @Get('free-length')
-    @Throttle({ default: { ttl: 60000, limit: 200 } })
     async getAllFreeBooks(): Promise<Books[]> {
         return (await this.booksService.findAllFreeBooksLength()) as unknown as Books[]
     }
 
+    @SkipThrottle(...filterSkipThrottler('storeBooks'))
+    @UseGuards(UserThrottlerGuard)
+    @Throttle({ storeBooks: { ttl: 60000, limit: 200 } })
     @Get('store')
-    @Throttle({ csrfToken: { ttl: 60000, limit: 100 } })
     async getAllStoreBooks() {
         return await this.booksService.findAllStoreBooks()
     }
+
+    @SkipThrottle(...filterSkipThrottler('storeBooks'))
+    @UseGuards(UserThrottlerGuard)
+    @Throttle({ storeBooks: { ttl: 60000, limit: 200 } })
     @Get('store/:id')
-    @Throttle({ csrfToken: { ttl: 60000, limit: 100 } })
     async getSpecificStoreBook(
         @Param('id', ParseIntPipe) id: number
     ): Promise<BookSpecific> {

@@ -10,8 +10,7 @@ import { AuthModule } from './auth/auth.module'
 import { EmailModule } from './emial/email.module'
 import { UserModel } from './user/user.module'
 import { CartModule } from './cart/cart.module'
-import { APP_FILTER, APP_GUARD } from '@nestjs/core'
-import { UserThrottlerGuard } from './Throttler/user.throttler.guard'
+import { APP_FILTER } from '@nestjs/core'
 import { ThrottlerExceptionFilter } from './Throttler/throttler-exception.filter'
 import { ApiPixModule } from './apiPix/apiPix.module'
 import { WebHookApiPixModule } from './webhook/webhook.module'
@@ -31,19 +30,119 @@ import { WebHookApiPixModule } from './webhook/webhook.module'
         ThrottlerModule.forRoot({
             throttlers: [
                 {
-                    name: 'default',
+                    name: 'publicBooks',
                     ttl: 60000,
                     limit: 200
                 },
                 {
-                    name: 'login',
+                    name: 'storeBooks',
                     ttl: 60000,
-                    limit: 4
+                    limit: 200
                 },
                 {
-                    name: 'csrfToken',
+                    name: 'payPixLimit',
                     ttl: 60000,
-                    limit: 50
+                    limit: 200
+                },
+                {
+                    name: 'isPaidLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'getCsrfTokenLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'verifyCsrfTokenLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'refreshLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'addLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'itemsLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'deleteLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'deleteAllLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'updatePriceLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'createPurchaseLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'purchasePaidLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'sendLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'confirmLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'signupLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'loginLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'profileLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'logoutLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'createAddressLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'getAddressLimit',
+                    ttl: 60000,
+                    limit: 200
+                },
+                {
+                    name: 'getCookieLimit',
+                    ttl: 60000,
+                    limit: 200
                 }
             ]
         }),
@@ -53,7 +152,6 @@ import { WebHookApiPixModule } from './webhook/webhook.module'
 
     providers: [
         AppService,
-        { provide: APP_GUARD, useClass: UserThrottlerGuard },
         { provide: APP_FILTER, useClass: ThrottlerExceptionFilter }
     ]
 })

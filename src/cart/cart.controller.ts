@@ -21,15 +21,18 @@ import { ItemCartDTP, PurchaseDataDTO, UpdataPriceDTO } from './cart.dto'
 import { CartService } from './cart.service'
 import { Request } from 'express'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
-import { Throttle } from '@nestjs/throttler'
+import { SkipThrottle, Throttle } from '@nestjs/throttler'
+import { filterSkipThrottler } from '../utils'
+import { UserThrottlerGuard } from '../Throttler/user.throttler.guard'
 
 @Controller('cart')
 export class CartController {
     constructor(private cartService: CartService) {}
 
+    @SkipThrottle(...filterSkipThrottler('addLimit'))
+    @UseGuards(CrsfGuard, JwtGuard, UserThrottlerGuard)
+    @Throttle({ addLimit: { ttl: 60000, limit: 30 } })
     @Post('add')
-    @UseGuards(CrsfGuard, JwtGuard)
-    @Throttle({ login: { ttl: 60000, limit: 30 } })
     async addToCart(@Req() req: Request, @Body() body: ItemCartDTP) {
         const userId = req['user'].userId as number
         try {
@@ -39,7 +42,8 @@ export class CartController {
                 body.photo,
                 body.price,
                 body.quant,
-                body.id
+                body.id,
+                body.stock
             )
         } catch (err) {
             if (err instanceof PrismaClientKnownRequestError) {
@@ -50,25 +54,29 @@ export class CartController {
         }
     }
 
+    @SkipThrottle(...filterSkipThrottler('itemsLimit'))
+    @UseGuards(CrsfGuard, JwtGuard, UserThrottlerGuard)
+    @Throttle({ itemsLimit: { ttl: 60000, limit: 200 } })
     @Get('items')
-    @UseGuards(CrsfGuard, JwtGuard)
-    @Throttle({ login: { ttl: 60000, limit: 100 } })
     async getItemsCart(@Req() req: Request) {
         const userId = req['user'].userId as number
         const items = await this.cartService.itemsCart(userId)
+
         return { items }
     }
 
+    @SkipThrottle(...filterSkipThrottler('deleteLimit'))
+    @UseGuards(CrsfGuard, JwtGuard, UserThrottlerGuard)
+    @Throttle({ deleteLimit: { ttl: 60000, limit: 30 } })
     @Delete('delete/:id')
-    @UseGuards(CrsfGuard, JwtGuard)
-    @Throttle({ login: { ttl: 60000, limit: 30 } })
     async deleteItemCart(@Param('id', ParseIntPipe) id: number) {
         return await this.cartService.delete(id)
     }
 
+    @SkipThrottle(...filterSkipThrottler('deleteAllLimit'))
+    @UseGuards(CrsfGuard, JwtGuard, UserThrottlerGuard)
+    @Throttle({ deleteAllLimit: { ttl: 60000, limit: 30 } })
     @Delete('delete-all')
-    @UseGuards(CrsfGuard, JwtGuard)
-    @Throttle({ login: { ttl: 60000, limit: 30 } })
     async deleteAllItemCart(@Req() req: Request) {
         const userId = req['user'].userId as number
 
@@ -85,9 +93,10 @@ export class CartController {
         }
     }
 
+    @SkipThrottle(...filterSkipThrottler('updatePriceLimit'))
+    @UseGuards(CrsfGuard, JwtGuard, UserThrottlerGuard)
+    @Throttle({ updatePriceLimit: { ttl: 60000, limit: 200 } })
     @Patch('update-price')
-    @UseGuards(CrsfGuard, JwtGuard)
-    @Throttle({ login: { ttl: 60000, limit: 100 } })
     async patchTotalPrice(@Req() req: Request, @Body() body: UpdataPriceDTO) {
         const userId = req['user'].userId as number
         const { quantCurrent, idItem } = body
@@ -95,9 +104,10 @@ export class CartController {
         return await this.cartService.patchQuant(userId, quantCurrent, idItem)
     }
 
+    @SkipThrottle(...filterSkipThrottler('createPurchaseLimit'))
+    @UseGuards(CrsfGuard, JwtGuard, UserThrottlerGuard)
+    @Throttle({ createPurchaseLimit: { ttl: 60000, limit: 30 } })
     @Post('create-purchase')
-    @UseGuards(CrsfGuard, JwtGuard)
-    // @Throttle({ login: { ttl: 60000, limit: 3 } })
     async postCreatePurchse(
         @Req() req: Request,
         @Body() body: PurchaseDataDTO
@@ -122,9 +132,10 @@ export class CartController {
         }
     }
 
+    @SkipThrottle(...filterSkipThrottler('purchasePaidLimit'))
+    @UseGuards(CrsfGuard, JwtGuard, UserThrottlerGuard)
+    @Throttle({ purchasePaidLimit: { ttl: 60000, limit: 100 } })
     @Get('purchase-paid')
-    @UseGuards(CrsfGuard, JwtGuard)
-    @Throttle({ login: { ttl: 60000, limit: 30 } })
     async getPurchasePaid(@Req() req: Request) {
         const userId = req['user'].userId as number
 

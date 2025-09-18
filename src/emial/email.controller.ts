@@ -15,15 +15,18 @@ import { Response } from 'express'
 import results from './utils/confirm.utils'
 import { join } from 'path'
 import { formatPhoneNumber } from '../auth/utils/formatPhone'
-import { Throttle } from '@nestjs/throttler'
+import { SkipThrottle, Throttle } from '@nestjs/throttler'
+import { filterSkipThrottler } from '../utils'
+import { UserThrottlerGuard } from '../Throttler/user.throttler.guard'
 
 @Controller('email')
 export class EmailController {
     constructor(private emailService: EmailService) {}
 
+    @SkipThrottle(...filterSkipThrottler('sendLimit'))
+    @UseGuards(CrsfGuard, UserThrottlerGuard)
+    @Throttle({ sendLimit: { ttl: 60000, limit: 5 } })
     @Post('send')
-    @UseGuards(CrsfGuard)
-    @Throttle({ login: { ttl: 60000, limit: 5 } })
     async postSendEmail(@Body() emailInfo: ContactDto): Promise<any> {
         const { emailUser, name, text, phone } = emailInfo
         const phoneFormated = formatPhoneNumber(phone)
@@ -51,8 +54,10 @@ export class EmailController {
         }
     }
 
+    @SkipThrottle(...filterSkipThrottler('confirmLimit'))
+    @UseGuards(UserThrottlerGuard)
+    @Throttle({ confirmLimit: { ttl: 60000, limit: 5 } })
     @Get('confirm')
-    @Throttle({ login: { ttl: 60000, limit: 5 } })
     async getConfirmEmail(@Res() res: Response, @Query('token') token: string) {
         try {
             const resultEmail = await this.emailService.confirmEmail(token)

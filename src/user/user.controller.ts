@@ -16,15 +16,17 @@ import { Request, Response } from 'express'
 import { JwtGuard } from '../auth/auth.jwt.guard'
 import * as jwt from 'jsonwebtoken'
 import { checkTokenFront } from './utils/user.utils'
-import { Throttle } from '@nestjs/throttler'
-
+import { SkipThrottle, Throttle } from '@nestjs/throttler'
+import { filterSkipThrottler } from '../utils'
+import { UserThrottlerGuard } from '../Throttler/user.throttler.guard'
 @Controller('user')
 export class UserController {
     constructor(private userService: UserService) {}
 
+    @SkipThrottle(...filterSkipThrottler('signupLimit'))
+    @UseGuards(CrsfGuard, UserThrottlerGuard)
+    @Throttle({ signupLimit: { ttl: 60000, limit: 5 } })
     @Post('signup')
-    @UseGuards(CrsfGuard)
-    @Throttle({ login: { ttl: 60000, limit: 5 } })
     async signup(@Req() req: Request, @Body() body: SignupDTO) {
         const { email, name, password } = body
         const token = req.cookies.token as string
@@ -36,9 +38,10 @@ export class UserController {
         return await this.userService.createUser(password, email, name)
     }
 
+    @SkipThrottle(...filterSkipThrottler('loginLimit'))
+    @UseGuards(CrsfGuard, UserThrottlerGuard)
+    @Throttle({ loginLimit: { ttl: 60000, limit: 5 } })
     @Post('login')
-    @UseGuards(CrsfGuard)
-    @Throttle({ login: { ttl: 60000, limit: 5 } })
     async login(
         @Body() body: LoginDTO,
         @Req() req: Request,
@@ -98,9 +101,10 @@ export class UserController {
         return res.status(200).json({ success: true })
     }
 
+    @SkipThrottle(...filterSkipThrottler('profileLimit'))
+    @UseGuards(CrsfGuard, JwtGuard, UserThrottlerGuard)
+    @Throttle({ profileLimit: { ttl: 60000, limit: 100 } })
     @Get('profile')
-    @UseGuards(CrsfGuard, JwtGuard)
-    @Throttle({ default: { ttl: 60000, limit: 100 } })
     async getProfileData(@Req() req: Request) {
         const profileData = await this.userService.profileData(
             req['user'].userId as number
@@ -108,9 +112,10 @@ export class UserController {
         return profileData
     }
 
+    @SkipThrottle(...filterSkipThrottler('logoutLimit'))
+    @UseGuards(CrsfGuard, UserThrottlerGuard)
+    @Throttle({ logoutLimit: { ttl: 60000, limit: 5 } })
     @Post('logout')
-    @UseGuards(CrsfGuard)
-    @Throttle({ login: { ttl: 60000, limit: 5 } })
     logout(@Res() res: Response) {
         res.clearCookie('token')
         res.clearCookie('refresh')
@@ -118,9 +123,10 @@ export class UserController {
         res.status(200).json({ msg: 'Logout realizado' })
     }
 
+    @SkipThrottle(...filterSkipThrottler('createAddressLimit'))
+    @UseGuards(CrsfGuard, JwtGuard, UserThrottlerGuard)
+    @Throttle({ createAddressLimit: { ttl: 60000, limit: 10 } })
     @Post('create-address')
-    @Throttle({ login: { ttl: 60000, limit: 10 } })
-    @UseGuards(CrsfGuard, JwtGuard)
     async postCreateAddress(
         @Req() req: Request,
         @Body() body: CreateAddressDto
@@ -156,9 +162,10 @@ export class UserController {
         return { success: true }
     }
 
+    @SkipThrottle(...filterSkipThrottler('getAddressLimit'))
+    @UseGuards(CrsfGuard, JwtGuard, UserThrottlerGuard)
+    @Throttle({ getAddressLimit: { ttl: 60000, limit: 200 } })
     @Get('get-address')
-    @UseGuards(CrsfGuard, JwtGuard)
-    @Throttle({ default: { ttl: 60000, limit: 200 } })
     async getAddress(@Req() req: Request) {
         const userId = req['user'].userId as number
         return await this.userService.addressUser(userId)

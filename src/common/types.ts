@@ -17,15 +17,16 @@ type CreditsValues = {
 
 export interface BookSpecific {
     summary: string
-    isbn: string
+    synopsis: string
     pageQuant: string
     tags: string
-    width: string
     store_books_credits: CreditsValues[]
     title: string
     photo: string
     id?: number
     price: number
+    stock: number
+    author: string
 }
 
 export interface Books {
