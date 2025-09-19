@@ -71,7 +71,7 @@ export class UserService {
                 from: process.env.EMAIL_USER,
                 to: user.email,
                 subject: 'Confirmação de email',
-                html: `<h2>Clique no link para confirmar seu email: <a href="http://localhost:3000/email/confirm?token=${token}">Confirmar Email</a></h2>`
+                html: `<h2>Clique no link para confirmar seu email: <a href="https://www.cidadeclipsebackend.com.br/email/confirm?token=${token}">Confirmar Email</a></h2>`
             }
 
             await this.emailService.sendEmail(mailOptions)
