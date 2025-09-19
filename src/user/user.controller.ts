@@ -49,7 +49,6 @@ export class UserController {
     ) {
         const { email, password } = body
         const tokenFrontend = req.cookies.token as string
-        console.log('token front', tokenFrontend)
         if (checkTokenFront(tokenFrontend)) {
             try {
                 jwt.verify(tokenFrontend, process.env.JWT_SECRET!)
