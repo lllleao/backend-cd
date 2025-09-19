@@ -114,8 +114,19 @@ export class UserController {
     @Throttle({ logoutLimit: { ttl: 60000, limit: 5 } })
     @Post('logout')
     logout(@Res() res: Response) {
-        res.clearCookie('token')
-        res.clearCookie('refresh')
+        res.clearCookie('token', {
+            path: '/',
+            httpOnly: true,
+            sameSite: 'none',
+            secure: true
+        })
+
+        res.clearCookie('refresh', {
+            path: '/auth/refresh',
+            httpOnly: true,
+            sameSite: 'none',
+            secure: true
+        })
 
         res.status(200).json({ msg: 'Logout realizado' })
     }
