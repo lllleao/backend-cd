@@ -71,7 +71,7 @@ export class AuthController {
                 httpOnly: true,
                 sameSite: isProduction ? 'none' : 'lax',
                 secure: isProduction,
-                maxAge: 3600000,
+                maxAge: 7200000,
                 domain: isProduction ? '64.181.171.109' : undefined
             })
 

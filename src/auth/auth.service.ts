@@ -17,8 +17,8 @@ export class AuthService {
             userId: number
         }
 
-        const token = await generateJWTToken('30m', email, userId)
-        const refresh = await generateRefreshJWTToken('30m', email, userId)
+        const token = await generateJWTToken('1h', email, userId)
+        const refresh = await generateRefreshJWTToken('7d', email, userId)
 
         return { token, refresh }
     }
