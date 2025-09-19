@@ -49,7 +49,7 @@ export class UserController {
     ) {
         const { email, password } = body
         const tokenFrontend = req.cookies.token as string
-
+        console.log('token front', tokenFrontend)
         if (checkTokenFront(tokenFrontend)) {
             try {
                 jwt.verify(tokenFrontend, process.env.JWT_SECRET!)
@@ -80,23 +80,20 @@ export class UserController {
             password
         )
 
-        const isProduction = process.env.PRODUCTION === 'production'
         res.cookie('token', token, {
             path: '/',
             httpOnly: true,
-            sameSite: isProduction ? 'none' : 'lax',
-            secure: isProduction,
-            maxAge: 3600000,
-            domain: isProduction ? 'www.cidadeclipsebackend.com.br' : undefined
+            sameSite: 'none',
+            secure: true,
+            maxAge: 3600000
         })
 
         res.cookie('refresh', refreshToken, {
             path: '/auth/refresh',
             httpOnly: true,
-            sameSite: isProduction ? 'none' : 'lax',
-            secure: isProduction,
-            maxAge: 604800000,
-            domain: isProduction ? 'www.cidadeclipsebackend.com.br' : undefined
+            sameSite: 'none',
+            secure: true,
+            maxAge: 604800000
         })
         return res.status(200).json({ success: true })
     }

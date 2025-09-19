@@ -55,28 +55,21 @@ export class AuthController {
         try {
             const { refresh, token } =
                 await this.authService.refreshJWT(refreshToken)
-            const isProduction = process.env.PRODUCTION === 'production'
 
             res.cookie('refresh', refresh, {
                 path: '/auth/refresh',
                 httpOnly: true,
-                sameSite: isProduction ? 'none' : 'lax',
-                secure: isProduction,
-                maxAge: 604800000,
-                domain: isProduction
-                    ? 'www.cidadeclipsebackend.com.br'
-                    : undefined
+                sameSite: 'none',
+                secure: true,
+                maxAge: 604800000
             })
 
             res.cookie('token', token, {
                 path: '/',
                 httpOnly: true,
-                sameSite: isProduction ? 'none' : 'lax',
-                secure: isProduction,
-                maxAge: 7200000,
-                domain: isProduction
-                    ? 'www.cidadeclipsebackend.com.br'
-                    : undefined
+                sameSite: 'none',
+                secure: true,
+                maxAge: 7200000
             })
 
             return res.status(200).json({ msg: 'Token atualizado' })
