@@ -87,7 +87,7 @@ export class UserController {
             sameSite: isProduction ? 'none' : 'lax',
             secure: isProduction,
             maxAge: 3600000,
-            domain: isProduction ? '64.181.171.109' : undefined
+            domain: isProduction ? 'www.cidadeclipsebackend.com.br' : undefined
         })
 
         res.cookie('refresh', refreshToken, {
@@ -96,7 +96,7 @@ export class UserController {
             sameSite: isProduction ? 'none' : 'lax',
             secure: isProduction,
             maxAge: 604800000,
-            domain: isProduction ? '64.181.171.109' : undefined
+            domain: isProduction ? 'www.cidadeclipsebackend.com.br' : undefined
         })
         return res.status(200).json({ success: true })
     }

@@ -24,6 +24,8 @@ export class BooksController {
         @Query('take', ParseIntPipe) take: number,
         @Query('skip', ParseIntPipe) skip: number
     ): Promise<Books[]> {
+        const isProduction = process.env.PRODUCTION === 'production'
+        console.log(isProduction)
         return (await this.booksService.findFreeBooks(
             take,
             skip

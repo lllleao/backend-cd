@@ -43,7 +43,12 @@ async function bootstrap() {
             }
         },
         methods: 'GET,POST,OPTIONS,DELETE,PATCH',
-        allowedHeaders: ['Content-Type', 'csrf-token', 'authorization'],
+        allowedHeaders: [
+            'Content-Type',
+            'csrf-token',
+            'Authorization',
+            'Cookie'
+        ],
         credentials: true
     })
 

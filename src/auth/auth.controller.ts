@@ -63,7 +63,9 @@ export class AuthController {
                 sameSite: isProduction ? 'none' : 'lax',
                 secure: isProduction,
                 maxAge: 604800000,
-                domain: isProduction ? '64.181.171.109' : undefined
+                domain: isProduction
+                    ? 'www.cidadeclipsebackend.com.br'
+                    : undefined
             })
 
             res.cookie('token', token, {
@@ -72,7 +74,9 @@ export class AuthController {
                 sameSite: isProduction ? 'none' : 'lax',
                 secure: isProduction,
                 maxAge: 7200000,
-                domain: isProduction ? '64.181.171.109' : undefined
+                domain: isProduction
+                    ? 'www.cidadeclipsebackend.com.br'
+                    : undefined
             })
 
             return res.status(200).json({ msg: 'Token atualizado' })
