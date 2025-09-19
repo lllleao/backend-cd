@@ -17,12 +17,10 @@ export class UserThrottlerGuard extends ThrottlerGuard {
 
         if (typeof forwarded === 'string') {
             const ipReal = forwarded.split(',')[0].trim()
-            console.log('Dentro do forwarded', `ip-${ipReal}`)
             return `ip-${ipReal}`
         }
 
         if (req.ip && req.ip !== '127.0.0.1' && req.ip !== '::1') {
-            console.log('Fora do forwarded', `ip-${req.ip}`)
             return `ip-${req.ip}`
         }
 

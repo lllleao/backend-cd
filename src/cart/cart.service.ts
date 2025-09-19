@@ -123,7 +123,13 @@ export class CartService {
             )
         }
 
-        const totalPrice = items.reduce((acum, currentItem) => {
+        const productsOnCart = await this.prismaService.item.findMany({
+            where: {
+                userId
+            }
+        })
+
+        const totalPrice = productsOnCart.reduce((acum, currentItem) => {
             return acum + currentItem.price * currentItem.quant
         }, 0)
 
