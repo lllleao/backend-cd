@@ -88,7 +88,7 @@ export class UserController {
         })
 
         res.cookie('refresh', refreshToken, {
-            path: '/auth/refresh',
+            path: '/',
             httpOnly: true,
             sameSite: 'none',
             secure: true,
