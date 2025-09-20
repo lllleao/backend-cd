@@ -47,8 +47,6 @@ export class UserController {
         @Req() req: Request,
         @Res() res: Response
     ) {
-        console.log('chegou login', req)
-        console.log('chegou login', res)
         const { email, password } = body
         const tokenFrontend = req.cookies.token as string
         if (checkTokenFront(tokenFrontend)) {
