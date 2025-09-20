@@ -41,10 +41,7 @@ export class AuthController {
     @UseGuards(CrsfGuard, UserThrottlerGuard)
     @Throttle({ verifyCsrfTokenLimit: { ttl: 60000, limit: 200 } })
     @Post('verify-csrfToken')
-    getVerifyCsrfToken(@Req() req: Request, @Res() res: Response) {
-        console.log('chegou verify-tokey', req)
-        console.log('chegou verify-tokey', res)
-
+    getVerifyCsrfToken() {
         return { success: true }
     }
 

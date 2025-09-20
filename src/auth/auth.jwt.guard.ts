@@ -13,8 +13,6 @@ export class JwtGuard implements CanActivate {
         const req = context.switchToHttp().getRequest<AuthenticatedRequest>()
 
         const token = req.cookies.token as string
-        console.log('token', token)
-        console.log('request', req)
         if (!token) {
             throw new BadRequestException({
                 message: 'Token ausente.',
