@@ -13,77 +13,22 @@
 Outras bibliotecas importantes:
 
 - **bcrypt** – hash de senhas para garantir segurança dos dados do usuário.
-- **cookie-parser**, **helmet**, **express-rate-limit** – middlewares para segurança, parsing de cookies e controle de requisições.
+- **cookie-parser**, **helmet** – middlewares para segurança e parsing de cookies.
 - **class-validator** & **class-transformer** – validação automática de DTOs, promovendo dados consistentes e limpos.
-- **nodemailer** – preparado para notificações via e-mail e envio de mensagens posteriores.
-- **rxjs** – integrado com NestJS para programação reativa quando necessário.
-
----
-
-## 🚧 Funcionalidades (em desenvolvimento)
-
-Todas as seguintes funcionalidades estão sendo desenvolvidas e ainda não estão disponíveis em produção:
-
-- Cadastro e login de usuários.
-- Autenticação com JWT e proteção CSRF.
-- Hash de senhas com sal via `bcrypt`.
-- CRUD em carrinho de compras – adicionar, remover itens e listar conteúdo.
-- Finalização de pedido via pagamento **PIX**.
-- Segurança reforçada por `helmet`, `cookie-parser` e `express-rate-limit`.
-- Validação e transformação de dados com `class-validator` e `class-transformer`.
-- Suporte futuro para envio de e-mails com `nodemailer`.
+- **Nodemailer**: para recursos de notificação por e-mail.
+- **Nest-Throttle + Helmet**: hardening de segurança com rate limiting e proteção de cabeçalhos HTTP.
+- **Oracle Cloud + Docker + Nginx**: O backend está em contêiner Docker, implantado na Oracle Cloud, com o Nginx configurado como proxy reverso para gerenciar requisições HTTPS e terminação TLS
 
 ---
 
 ## ✅ Funcionalidade em produção
 
 - Endpoints públicos que entregam livros gratuitos disponíveis no site.
-
----
-
-## ⚙️ Banco de Dados
-
-Utiliza **MySQL** gerenciado por **Prisma**, com esquema organizado em tabelas para usuários, tokens, carrinho, pedidos, itens de pedidos, e livros disponíveis.
-
----
-
-## 🐳 Como Rodar com Docker
-
-1. Clonar o repositório:
-
-```shell
-git clone https://github.com/lllleao/backend-cd.git
-cd backend-cd
-```
-
-2. Buildar e subir os containers:
-
-```shell
-docker-compose up --build -d
-```
-
-3. Acompanhar os logs do backend:
-
-```shell
-docker-compose logs -f backend
-```
-
-4. Derrubar os containers:
-```shell
-docker-compose down
-```
-
-🌐 Acesso
-
-Backend disponível em: http://localhost:3000
-
-Banco de dados MySQL também é iniciado pelo docker-compose.
-
-## ⚡ Alternativa sem Docker
-```shell
-git clone https://github.com/lllleao/backend-cd.git
-cd backend-cd
-npm install
-npx prisma generate
-npm run start:dev
-```
+- Cadastro e login de usuários.
+- Autenticação com JWT e proteção CSRF.
+- Hash de senhas com sal via `bcrypt`.
+- CRUD em carrinho de compras – adicionar, remover itens e listar conteúdo.
+- Finalização de pedido via pagamento **PIX**.
+- Segurança reforçada por `helmet`, `cookie-parser` e `nest-throttle`.
+- Validação e transformação de dados com `class-validator` e `class-transformer`.
+- Suporte para envio de e-mails com `nodemailer`.
