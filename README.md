@@ -2,6 +2,8 @@
 
 ## Este backend, batizado de **backend-cd**, serve como o núcleo de gestão dos serviços da Cidadeclipse, incluindo autenticação, controle de usuários, operações de carrinho de compras e entrega de livros gratuitos.
 [Conheça o Frontend do projeto!](https://github.com/lllleao/frontend-cd)
+
+### [Cidade Eclipse](https://www.cidadeclipse.com)
 ---
 
 ## 🧰 Tecnologias e Dependências
@@ -32,3 +34,4 @@ Outras bibliotecas importantes:
 - Segurança reforçada por `helmet`, `cookie-parser` e `nest-throttle`.
 - Validação e transformação de dados com `class-validator` e `class-transformer`.
 - Suporte para envio de e-mails com `nodemailer`.
+
